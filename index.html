@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>4-Week Training Calendar</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f5f5f5; }
-    h1, h2 { color: #2c3e50; }
-    .section { background: white; margin-bottom: 20px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .controls { position: sticky; top: 20px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    button { margin: 5px; padding: 8px 16px; border: none; background: #27ae60; color: white; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #219651; }
-    .progress-bar { background: #ecf0f1; border-radius: 10px; overflow: hidden; margin: 10px 0; height: 20px; }
-    .progress-fill { background: #27ae60; height: 100%; width: 0; transition: width .3s; }
-    .collapsible { cursor: pointer; padding: 10px; background: #2c3e50; color: white; border: none; width: 100%; text-align: left; border-radius: 4px; margin-bottom: 10px; }
-    .content { display: none; overflow: hidden; }
-    .exercise-item { margin-bottom: 10px; }
-    .exercise-item b { display: block; margin-bottom: 4px; }
-    .week { margin-bottom: 10px; }
-    .week-header { background: #34495e; color: white; padding: 10px; border-radius: 4px; font-size: 1.1em; }
-    .day { background: #fafafa; margin: 8px 0; padding: 10px; border-radius: 4px; }
-    .day-header { font-weight: bold; margin-bottom: 6px; }
-    .tracking { background: #e8f6f3; padding: 8px; border-radius: 4px; }
-    .tracking-row { display: flex; align-items: center; margin-bottom: 6px; }
-    .tracking-row input[type="checkbox"] { transform: scale(1.2); margin-right: 8px; }
-    .tracking-row label { flex: 1; }
-    .tracking-row input[type="number"] { width: 60px; margin-left: 8px; padding: 4px; }
+    body { font-family: Arial, sans-serif; max-width:800px; margin:auto; padding:20px; background:#f5f5f5; }
+    h1,h2 { color:#2c3e50; }
+    .section, .controls { background:#fff; margin-bottom:20px; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+    .controls { position:sticky; top:20px; }
+    button { margin:5px; padding:8px 16px; border:none; background:#27ae60; color:#fff; border-radius:4px; cursor:pointer; }
+    button:hover { background:#219651; }
+    .progress-bar { background:#ecf0f1; border-radius:10px; overflow:hidden; height:20px; margin:10px 0; }
+    .progress-fill { background:#27ae60; height:100%; width:0; transition:width .3s; }
+    .collapsible { cursor:pointer; padding:10px; background:#2c3e50; color:#fff; border:none; width:100%; text-align:left; border-radius:4px; margin-bottom:10px; }
+    .content { display:none; overflow:hidden; }
+    .exercise-item b { display:block; margin-bottom:4px; }
+    .week { margin-bottom:10px; }
+    .week-header { background:#34495e; color:#fff; padding:10px; border-radius:4px; font-size:1.1em; }
+    .day { background:#fafafa; margin:8px 0; padding:10px; border-radius:4px; }
+    .day-header { font-weight:bold; margin-bottom:6px; }
+    .tracking-row { display:flex; align-items:center; margin-bottom:6px; }
+    .tracking-row input[type="checkbox"] { transform:scale(1.2); margin-right:8px; }
+    .tracking-row label { flex:1; }
+    .tracking-row input[type="number"] { width:60px; margin-left:8px; padding:4px; }
   </style>
 </head>
 <body>
@@ -87,100 +85,95 @@
   <div id="calendar-container"></div>
 
   <script>
-    const start = new Date("2025-09-08");
-    const micro = ["Wall Sit","Push-ups","Seated Band Row","Hip Hinge Drill","Plank w/ Shoulder Taps","Standing Calf Raises","Split Squat","Chair Dips","Pallof Press","Glute Bridge March","Incline Push-ups","Lateral Band Walk","Single-Leg RDL","Hollow-Body Hold","Banded Overhead Press"];
-    const skillSets = [["DNS Breathing","Bear Crawl Hold"],["Bird Dog","Hip 90/90 Stretch"],["Bodyweight Squat Practice","Wall Slides"],["Band Pull-aparts","Cat-Cow"],["Ankle Mobilization"]];
-    const eccA=["Negative Pull-ups","Nordic Hamstring Curls","Eccentric Push-ups"];
-    const eccB=["Step-Down Negatives","Single-Leg RDL Negative","Negative Pull-ups"];
-    const heavyLower=["Deadlift","Goblet Squat","Farmer's Carry"];
-    const heavyUpper=["Assisted Pull-ups","Push-up Variant"];
-    const calendar = [];
-    for(let w=0; w<4; w++){
-      const weekDays = [];
-      for(let d=0; d<7; d++){
-        const dt = new Date(start);
-        dt.setDate(start.getDate() + w*7 + d);
-        const dd = dt.getDate().toString().padStart(2,'0');
-        const mon = dt.toLocaleDateString('en-GB',{month:'short',year:'2-digit'});
-        const dateStr = `${dd}-${mon}`;
-        const dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-        const idx = dt.getDay();
+    const start=new Date("2025-09-08");
+    const micro=["Wall Sit","Push-ups","Seated Band Row","Hip Hinge Drill","Plank w/ Shoulder Taps","Standing Calf Raises","Split Squat","Chair Dips","Pallof Press","Glute Bridge March","Incline Push-ups","Lateral Band Walk","Single-Leg RDL","Hollow-Body Hold","Banded Overhead Press"];
+    const skills=[["DNS Breathing","Bear Crawl Hold"],["Bird Dog","Hip 90/90 Stretch"],["Bodyweight Squat Practice","Wall Slides"],["Band Pull-aparts","Cat-Cow"],["Ankle Mobilization"]];
+    const eccA=["Negative Pull-ups","Nordic Hamstring Curls","Eccentric Push-ups"], eccB=["Step-Down Negatives","Single-Leg RDL Negative","Negative Pull-ups"];
+    const heavyLower=["Deadlift","Goblet Squat","Farmer's Carry"], heavyUpper=["Assisted Pull-ups","Push-up Variant"];
+    const calendar=[];
+
+    for(let w=0;w<4;w++){
+      const days=[];
+      for(let d=0;d<7;d++){
+        const dt=new Date(start); dt.setDate(start.getDate()+w*7+d);
+        const dd=dt.getDate().toString().padStart(2,"0");
+        const mon=dt.toLocaleDateString("en-GB",{month:"short",year:"2-digit"});
+        const date=`${dd}-${mon}`;
+        const names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], idx=dt.getDay();
         let list=[];
-        if(idx===1) list = [...heavyLower, ...micro.slice((w*3)%15, (w*3)%15+3)];
-        else if(idx===2) list = [...micro.slice((w*3+3)%15,(w*3+6)%15), ...skillSets[w%skillSets.length]];
-        else if(idx===3) list = w%2 ? eccB : eccA;
-        else if(idx===4) list = [...micro.slice((w*3+6)%15,(w*3+9)%15), ...skillSets[(w+1)%skillSets.length]];
-        else if(idx===5) list = [...heavyUpper, ...micro.slice((w*3+9)%15,(w*3+12)%15)];
-        else if(idx===6) list = [...micro.slice((w*3+12)%15,(w*3+15)%15), ...skillSets[(w+2)%skillSets.length]];
-        else list = [];
-        weekDays.push({ day: dayNames[idx], date: dateStr, exercises: list });
+        // Monday: heavy+micro
+        if(idx===1){
+          list=[...heavyLower];
+          for(let i=0;i<3;i++) list.push(micro[(w*3+i)%15]);
+        }
+        // Tuesday: micro+skill
+        else if(idx===2){
+          for(let i=3;i<6;i++) list.push(micro[(w*3+i)%15]);
+          list.push(...skills[w%skills.length]);
+        }
+        // Wednesday: micro+ecc
+        else if(idx===3){
+          for(let i=6;i<9;i++) list.push(micro[(w*3+i)%15]);
+          list.push(...(w%2?eccB:eccA));
+        }
+        // Thursday: micro+skill
+        else if(idx===4){
+          for(let i=9;i<12;i++) list.push(micro[(w*3+i)%15]);
+          list.push(...skills[(w+1)%skills.length]);
+        }
+        // Friday: heavy+micro
+        else if(idx===5){
+          list=[...heavyUpper];
+          for(let i=12;i<15;i++) list.push(micro[(w*3+i)%15]);
+        }
+        // Saturday: skill only
+        else if(idx===6){
+          list.push(...skills[(w+2)%skills.length]);
+        }
+        days.push({day:names[idx],date,exercises:list});
       }
-      const startDate = weekDays[0].date, endDate = weekDays[6].date;
-      calendar.push({ week: w+1, range: `${startDate} - ${endDate}`, days: weekDays });
+      const wkStart=days[1].date,wkEnd=days[5].date;
+      calendar.push({week:w+1,range:`${wkStart} - ${wkEnd}`,days});
     }
 
-    let prog = JSON.parse(localStorage.getItem("prog")||"{}");
-
+    let prog=JSON.parse(localStorage.getItem("prog")||"{}");
     function render(){
-      const cont = document.getElementById("calendar-container");
-      cont.innerHTML = "";
-      let total=0, done=0;
+      const cont=document.getElementById("calendar-container"); cont.innerHTML="";
+      let total=0,done=0;
       calendar.forEach(wk=>{
-        const hdr = document.createElement("button");
-        hdr.className="collapsible";
-        hdr.textContent = `Week ${wk.week} - ${wk.range}`;
-        const body = document.createElement("div");
-        body.className="content week";
+        const hdr=document.createElement("button"); hdr.className="collapsible";
+        hdr.textContent=`Week ${wk.week} - ${wk.range}`;
+        const body=document.createElement("div"); body.className="content week";
         wk.days.forEach(d=>{
-          let rows = `<div class="day"><div class="day-header">${d.day} (${d.date})</div><div class="tracking">`;
+          let html=`<div class="day"><div class="day-header">${d.day} (${d.date})</div><div class="tracking">`;
           d.exercises.forEach(ex=>{
-            const id = `${d.date}-${ex.replace(/ /g,"_")}`;
-            const type = heavyLower.concat(heavyUpper).includes(ex) ? "heavy" :
-                         eccA.concat(eccB).includes(ex) ? "ecc" :
-                         skillSets.flat().includes(ex) ? "skill" : "micro";
-            if(type==="micro"||type==="skill"){
-              total++; if(prog[id]?.done) done++;
-              rows += `<div class="tracking-row"><input type="checkbox" onchange="setD('${id}','done',this.checked)" ${prog[id]?.done?"checked":""}/><label>${ex}</label><input type="number" placeholder="Reps" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/></div>`;
-            } else if(type==="heavy"){
-              ["weight","reps","rpe"].forEach(f=>{ total++; if(prog[id]?.[f]) done++; });
-              rows += `<div class="tracking-row"><label>${ex}</label> Wt <input type="number" onchange="setD('${id}','weight',this.value)" value="${prog[id]?.weight||""}"/> Reps <input type="number" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/> RPE <input type="number" onchange="setD('${id}','rpe',this.value)" value="${prog[id]?.rpe||""}"/></div>`;
-            } else if(type==="ecc"){
-              ["reps","rpe"].forEach(f=>{ total++; if(prog[id]?.[f]) done++; });
-              rows += `<div class="tracking-row"><label>${ex}</label> Reps <input type="number" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/> RPE <input type="number" onchange="setD('${id}','rpe',this.value)" value="${prog[id]?.rpe||""}"/></div>`;
+            const id=`${d.date}-${ex.replace(/ /g,"_")}`;
+            const type=heavyLower.concat(heavyUpper).includes(ex)?"heavy":eccA.concat(eccB).includes(ex)?"ecc":skills.flat().includes(ex)?"skill":"micro";
+            if(type==="micro"||type==="skill"){ total++; if(prog[id]?.done) done++;
+              html+=`<div class="tracking-row"><input type="checkbox" onchange="setD('${id}','done',this.checked)" ${prog[id]?.done?"checked":""}/><label>${ex}</label><input type="number" placeholder="Reps" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/></div>`;
+            } else if(type==="heavy"){["weight","reps","rpe"].forEach(f=>{total++;if(prog[id]?.[f])done++;});
+              html+=`<div class="tracking-row"><label>${ex}</label> Wt <input type="number" onchange="setD('${id}','weight',this.value)" value="${prog[id]?.weight||""}"/> Reps <input type="number" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/> RPE <input type="number" onchange="setD('${id}','rpe',this.value)" value="${prog[id]?.rpe||""}"/></div>`;
+            } else {["reps","rpe"].forEach(f=>{total++;if(prog[id]?.[f])done++;});
+              html+=`<div class="tracking-row"><label>${ex}</label> Reps <input type="number" onchange="setD('${id}','reps',this.value)" value="${prog[id]?.reps||""}"/> RPE <input type="number" onchange="setD('${id}','rpe',this.value)" value="${prog[id]?.rpe||""}"/></div>`;
             }
           });
-          rows += `</div></div>`;
-          body.innerHTML += rows;
+          html+="</div></div>";
+          body.innerHTML+=html;
         });
-        cont.appendChild(hdr);
-        cont.appendChild(body);
+        cont.appendChild(hdr); cont.appendChild(body);
       });
-      const pct = total ? Math.round(done/total*100) : 0;
-      document.getElementById("progress-text").innerText = `${pct}%`;
-      document.getElementById("progress-fill").style.width = `${pct}%`;
-      document.querySelectorAll(".collapsible").forEach(btn=>btn.addEventListener("click",function(){
-        const nxt = this.nextElementSibling;
-        nxt.style.display = nxt.style.display==="block"?"none":"block";
+      const pct=total?Math.round(done/total*100):0;
+      document.getElementById("progress-text").innerText=`${pct}%`;
+      document.getElementById("progress-fill").style.width=`${pct}%`;
+      document.querySelectorAll(".collapsible").forEach(btn=>btn.addEventListener("click",()=>{
+        const nxt=btn.nextElementSibling; nxt.style.display=nxt.style.display==="block"?"none":"block";
       }));
     }
 
-    function setD(id,field,val){
-      prog[id] = prog[id]||{};
-      prog[id][field] = val;
-      localStorage.setItem("prog",JSON.stringify(prog));
-      render();
-    }
-    function save(){ localStorage.setItem("prog",JSON.stringify(prog)); alert("Progress saved!"); }
-    function resetAll(){ if(confirm("Reset all progress?")){ prog={}; localStorage.removeItem("prog"); render(); } }
-    function exportLog(){
-      let txt="Training Log\n\n";
-      for(const k in prog) txt+=`${k}: ${JSON.stringify(prog[k])}\n`;
-      const blob = new Blob([txt],{type:"text/plain"}), url = URL.createObjectURL(blob),
-            a = document.createElement("a");
-      a.href = url; a.download = "training-log.txt"; a.click();
-      URL.revokeObjectURL(url);
-    }
-
+    function setD(id,field,val){prog[id]=prog[id]||{};prog[id][field]=val;localStorage.setItem("prog",JSON.stringify(prog));render();}
+    function save(){localStorage.setItem("prog",JSON.stringify(prog));alert("Progress saved!");}
+    function resetAll(){if(confirm("Reset all?")){prog={};localStorage.removeItem("prog");render();}}
+    function exportLog(){let txt="Training Log\n\n";for(const k in prog)txt+=`${k}: ${JSON.stringify(prog[k])}\n`;const b=new Blob([txt],{type:"text/plain"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="training-log.txt";a.click();URL.revokeObjectURL(u);}
     document.addEventListener("DOMContentLoaded",render);
   </script>
 </body>
