@@ -84,7 +84,106 @@
 
   <div id="calendar-container"></div>
 
+   <div class="controls">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div>Progress: <span id="progress-text">0%</span> <span id="sync-status">⏳ Loading...</span></div>
+    <button onclick="save()">Save Progress</button>
+    <button onclick="exportLog()">Export Log</button>
+    <button onclick="resetAll()">Reset All</button>
+  </div>TYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4-Week Training Calendar</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:800px; margin:auto; padding:20px; background:#f5f5f5; }
+    h1,h2 { color:#2c3e50; }
+    .section, .controls { background:#fff; margin-bottom:20px; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+    .controls { position:sticky; top:20px; }
+    button { margin:5px; padding:8px 16px; border:none; background:#27ae60; color:#fff; border-radius:4px; cursor:pointer; }
+    button:hover { background:#219651; }
+    .progress-bar { background:#ecf0f1; border-radius:10px; overflow:hidden; height:20px; margin:10px 0; }
+    .progress-fill { background:#27ae60; height:100%; width:0; transition:width .3s; }
+    .collapsible { cursor:pointer; padding:10px; background:#2c3e50; color:#fff; border:none; width:100%; text-align:left; border-radius:4px; margin-bottom:10px; }
+    .content { display:none; overflow:hidden; }
+    .exercise-item b { display:block; margin-bottom:4px; }
+    .week { margin-bottom:10px; }
+    .week-header { background:#34495e; color:#fff; padding:10px; border-radius:4px; font-size:1.1em; }
+    .day { background:#fafafa; margin:8px 0; padding:10px; border-radius:4px; }
+    .day-header { font-weight:bold; margin-bottom:6px; }
+    .tracking-row { display:flex; align-items:center; margin-bottom:6px; }
+    .tracking-row input[type="checkbox"] { transform:scale(1.2); margin-right:8px; }
+    .tracking-row label { flex:1; }
+    .tracking-row input[type="number"] { width:60px; margin-left:8px; padding:4px; }
+  </style>
+</head>
+<body>
+  <h1>4-Week Training Calendar</h1>
+
+  <button class="collapsible">Exercise Reference & Form Cues</button>
+  <div class="content section">
+    <h2>Office Micro-Workouts</h2>
+    <div class="exercise-item"><b>Wall Sit</b> Back flat, knees at 90°, brace core.</div>
+    <div class="exercise-item"><b>Push-ups</b> Hands under shoulders, full range, core tight.</div>
+    <div class="exercise-item"><b>Seated Band Row</b> Anchor band, hinge hips, retract scapula.</div>
+    <div class="exercise-item"><b>Hip Hinge Drill</b> Hinge at hips, neutral spine.</div>
+    <div class="exercise-item"><b>Plank w/ Shoulder Taps</b> Hips stable, tap opposite shoulder.</div>
+    <div class="exercise-item"><b>Standing Calf Raises</b> Pause at top, control down.</div>
+    <div class="exercise-item"><b>Split Squat</b> Rear foot elevated, front thigh parallel.</div>
+    <div class="exercise-item"><b>Chair Dips</b> Elbows back, lean forward.</div>
+    <div class="exercise-item"><b>Pallof Press</b> Press away, resist rotation.</div>
+    <div class="exercise-item"><b>Glute Bridge March</b> Hips high, alternate knee drive.</div>
+    <div class="exercise-item"><b>Incline Push-ups</b> Hands on desk, core braced.</div>
+    <div class="exercise-item"><b>Lateral Band Walk</b> Band above knees, small steps.</div>
+    <div class="exercise-item"><b>Single-Leg RDL</b> Hinge on one leg, spine neutral.</div>
+    <div class="exercise-item"><b>Hollow-Body Hold</b> Lower back pressed, legs & arms off floor.</div>
+    <div class="exercise-item"><b>Banded Overhead Press</b> Stand on band, press overhead.</div>
+
+    <h2>Skill Practice</h2>
+    <div class="exercise-item"><b>DNS Breathing</b> 5×30s diaphragmatic with brace.</div>
+    <div class="exercise-item"><b>Bear Crawl Hold</b> Hips off floor, back flat.</div>
+    <div class="exercise-item"><b>Bird Dog</b> Extend opposite arm/leg, hold 2-3s.</div>
+    <div class="exercise-item"><b>Bodyweight Squat Practice</b> Slow 3s down, full depth.</div>
+    <div class="exercise-item"><b>Wall Slides</b> Back & arms on wall, slide overhead.</div>
+    <div class="exercise-item"><b>Hip 90/90 Stretch</b> Rotate knees, pause each side.</div>
+    <div class="exercise-item"><b>Band Pull-aparts</b> Squeeze scapula, slow return.</div>
+    <div class="exercise-item"><b>Cat-Cow</b> Alternate arch & sag, mobilize spine.</div>
+    <div class="exercise-item"><b>Ankle Mobilization</b> Knee to wall, heel down.</div>
+
+    <h2>Eccentric Program</h2>
+    <div class="exercise-item"><b>Negative Pull-ups</b> 5s descent, control lowering.</div>
+    <div class="exercise-item"><b>Nordic Hamstring Curls</b> 4-5s negative.</div>
+    <div class="exercise-item"><b>Step-Down Negatives</b> 3s descent from 18" box.</div>
+    <div class="exercise-item"><b>Eccentric Push-ups</b> 4s lower, feet elevated.</div>
+    <div class="exercise-item"><b>Single-Leg RDL Negative</b> 3s hinge descent.</div>
+
+    <h2>Heavy Lifting</h2>
+    <div class="exercise-item"><b>Deadlift</b> Neutral spine, bar close, drive hips.</div>
+    <div class="exercise-item"><b>Goblet Squat</b> Chest up, depth to parallel.</div>
+    <div class="exercise-item"><b>Farmer's Carry</b> Brace core, steady pace.</div>
+    <div class="exercise-item"><b>Assisted Pull-ups</b> Full range, scapula retracted.</div>
+    <div class="exercise-item"><b>Push-up Variant</b> Full depth, core tight.</div>
+  </div>
+
+  <div class="controls section">
+    <div>Progress: <span id="progress-text">0%</span></div>
+    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+    <button onclick="save()">Save Progress</button>
+    <button onclick="exportLog()">Export Log</button>
+    <button onclick="resetAll()">Reset All</button>
+  </div>
+
+  <div id="calendar-container"></div>
+
   <script>
+    // JSONBin.io configuration - user will need to replace with their own
+    const JSONBIN_BIN_ID = '68b792b243b1c97be934fbf5'; // Replace with your JSONBin bin ID
+    const JSONBIN_API_KEY = '$2a$10$GbiNlHNG87MpiNCJIDtR3.DKL3ShbJAEocKCvAbkmN2jLksxXcsMm'; // Replace with your JSONBin API key
+    const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3/b/';
+
     const start=new Date("2025-09-08");
     const micro=["Wall Sit","Push-ups","Seated Band Row","Hip Hinge Drill","Plank w/ Shoulder Taps","Standing Calf Raises","Split Squat","Chair Dips","Pallof Press","Glute Bridge March","Incline Push-ups","Lateral Band Walk","Single-Leg RDL","Hollow-Body Hold","Banded Overhead Press"];
     const skills=[["DNS Breathing","Bear Crawl Hold"],["Bird Dog","Hip 90/90 Stretch"],["Bodyweight Squat Practice","Wall Slides"],["Band Pull-aparts","Cat-Cow"],["Ankle Mobilization"]];
@@ -136,8 +235,110 @@
       calendar.push({week:w+1,range:`${wkStart} - ${wkEnd}`,days});
     }
 
-    let prog=JSON.parse(localStorage.getItem("prog")||"{}");
+    let prog={};
+    let openSections = []; // Track which sections are open
+    let isOnline = navigator.onLine; // Track online status
+    let syncPending = false; // Track if sync is needed
+
+    // Cloud sync functions
+    async function syncToCloud() {
+      if (!isOnline || !JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') {
+        console.log('Offline mode or no cloud config - using localStorage only');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${JSONBIN_BASE_URL}${JSONBIN_BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_API_KEY,
+            'X-Bin-Versioning': false
+          },
+          body: JSON.stringify(prog)
+        });
+
+        if (response.ok) {
+          console.log('Successfully synced to cloud');
+          localStorage.setItem("prog", JSON.stringify(prog)); // Also save locally as backup
+          syncPending = false;
+          updateSyncStatus('synced');
+        } else {
+          throw new Error('Failed to sync to cloud');
+        }
+      } catch (error) {
+        console.error('Cloud sync failed:', error);
+        // Fallback to localStorage
+        localStorage.setItem("prog", JSON.stringify(prog));
+        syncPending = true;
+        updateSyncStatus('error');
+      }
+    }
+
+    async function syncFromCloud() {
+      if (!isOnline || !JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') {
+        // Load from localStorage
+        prog = JSON.parse(localStorage.getItem("prog") || "{}");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${JSONBIN_BASE_URL}${JSONBIN_BIN_ID}/latest`, {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': JSONBIN_API_KEY
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          prog = data.record || {};
+          console.log('Successfully loaded from cloud');
+          // Also save to localStorage as backup
+          localStorage.setItem("prog", JSON.stringify(prog));
+          updateSyncStatus('synced');
+        } else {
+          throw new Error('Failed to load from cloud');
+        }
+      } catch (error) {
+        console.error('Cloud load failed:', error);
+        // Fallback to localStorage
+        prog = JSON.parse(localStorage.getItem("prog") || "{}");
+        updateSyncStatus('error');
+      }
+    }
+
+    function updateSyncStatus(status) {
+      const statusElement = document.getElementById('sync-status');
+      if (!statusElement) return;
+
+      switch(status) {
+        case 'synced':
+          statusElement.textContent = '☁️ Synced';
+          statusElement.style.color = '#27ae60';
+          break;
+        case 'pending':
+          statusElement.textContent = '⏳ Syncing...';
+          statusElement.style.color = '#f39c12';
+          break;
+        case 'error':
+          statusElement.textContent = '❌ Offline';
+          statusElement.style.color = '#e74c3c';
+          break;
+      }
+    }
+
     function render(){
+      // Save current open section states before re-rendering
+      const collapsibles = document.querySelectorAll(".collapsible");
+      openSections = [];
+      collapsibles.forEach((btn, index) => {
+        const content = btn.nextElementSibling;
+        if (content && content.style.display === "block") {
+          openSections.push(index);
+        }
+      });
+
       const cont=document.getElementById("calendar-container"); cont.innerHTML="";
       let total=0,done=0;
       calendar.forEach(wk=>{
@@ -165,16 +366,80 @@
       const pct=total?Math.round(done/total*100):0;
       document.getElementById("progress-text").innerText=`${pct}%`;
       document.getElementById("progress-fill").style.width=`${pct}%`;
-      document.querySelectorAll(".collapsible").forEach(btn=>btn.addEventListener("click",()=>{
-        const nxt=btn.nextElementSibling; nxt.style.display=nxt.style.display==="block"?"none":"block";
-      }));
+
+      document.querySelectorAll(".collapsible").forEach((btn, index) => {
+        btn.addEventListener("click",()=>{
+          const nxt=btn.nextElementSibling; 
+          nxt.style.display=nxt.style.display==="block"?"none":"block";
+        });
+
+        // Restore previously open sections
+        if (openSections.includes(index)) {
+          const content = btn.nextElementSibling;
+          if (content) {
+            content.style.display = "block";
+          }
+        }
+      });
     }
 
-    function setD(id,field,val){prog[id]=prog[id]||{};prog[id][field]=val;localStorage.setItem("prog",JSON.stringify(prog));render();}
-    function save(){localStorage.setItem("prog",JSON.stringify(prog));alert("Progress saved!");}
-    function resetAll(){if(confirm("Reset all?")){prog={};localStorage.removeItem("prog");render();}}
-    function exportLog(){let txt="Training Log\n\n";for(const k in prog)txt+=`${k}: ${JSON.stringify(prog[k])}\n`;const b=new Blob([txt],{type:"text/plain"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="training-log.txt";a.click();URL.revokeObjectURL(u);}
-    document.addEventListener("DOMContentLoaded",render);
+    async function setD(id,field,val){
+      prog[id]=prog[id]||{};
+      prog[id][field]=val;
+
+      // Update sync status to pending
+      updateSyncStatus('pending');
+
+      // Sync to cloud (with debouncing to avoid too many requests)
+      if (setD.timeout) clearTimeout(setD.timeout);
+      setD.timeout = setTimeout(async () => {
+        await syncToCloud();
+      }, 1000); // Wait 1 second after last change before syncing
+
+      render();
+    }
+
+    function save(){
+      syncToCloud();
+      alert("Syncing to cloud...");
+    }
+
+    function resetAll(){
+      if(confirm("Reset all progress? This will delete all data.")){
+        prog={};
+        localStorage.removeItem("prog");
+        syncToCloud();
+        render();
+      }
+    }
+
+    function exportLog(){
+      let txt="Training Log\n\n";
+      for(const k in prog) txt+=`${k}: ${JSON.stringify(prog[k])}\n`;
+      const b=new Blob([txt],{type:"text/plain"}),u=URL.createObjectURL(b),a=document.createElement("a");
+      a.href=u;a.download="training-log.txt";a.click();URL.revokeObjectURL(u);
+    }
+
+    // Handle online/offline events
+    window.addEventListener('online', async () => {
+      isOnline = true;
+      console.log('Back online - syncing data');
+      updateSyncStatus('pending');
+      await syncToCloud();
+    });
+
+    window.addEventListener('offline', () => {
+      isOnline = false;
+      console.log('Gone offline - will use localStorage');
+      updateSyncStatus('error');
+    });
+
+    // Initialize app
+    document.addEventListener("DOMContentLoaded", async () => {
+      updateSyncStatus('pending');
+      await syncFromCloud();
+      render();
+    });
   </script>
 </body>
 </html>
