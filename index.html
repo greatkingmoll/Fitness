@@ -20,8 +20,9 @@
     .day-header { font-weight:bold; margin-bottom:6px; }
     .tracking { margin-bottom:10px; }
     .tracking-row { display:flex; align-items:center; margin-bottom:6px; }
-    .tracking-row label { width:150px; }
-    .tracking-row input { width:50px; margin-left:8px; padding:4px; }
+    .tracking-row input[type="checkbox"] { transform:scale(1.2); margin-right:8px; }
+    .tracking-row label { width:120px; }
+    .tracking-row input[type="number"] { width:50px; margin-left:8px; padding:4px; }
   </style>
 </head>
 <body>
@@ -29,7 +30,7 @@
 
   <button class="collapsible">Exercise Reference & Form Cues</button>
   <div class="content section">
-    <h2>Office Micro-Workouts</h2>
+     <h2>Office Micro-Workouts</h2>
     <div class="exercise-item"><b>Wall Sit</b> Back flat, knees at 90°, brace core.</div>
     <div class="exercise-item"><b>Push-ups</b> Hands under shoulders, full range, core tight.</div>
     <div class="exercise-item"><b>Seated Band Row</b> Anchor band, hinge hips, retract scapula.</div>
@@ -73,13 +74,8 @@
   </div>
 
   <div class="controls">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill"></div>
-    </div>
-    <div>
-      Progress: <span id="progress-text">0%</span>
-      <span id="sync-status">⏳ Loading...</span>
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div>Progress: <span id="progress-text">0%</span> <span id="sync-status">⏳ Loading...</span></div>
     <button onclick="exportLog()">Export Log</button>
   </div>
 
@@ -112,20 +108,16 @@
     }
 
     let prog={}, openSections=[], online=navigator.onLine;
-    function upd(s){
-      const e=document.getElementById('sync-status');
-      e.textContent={synced:'☁️ Synced',pending:'⏳ Syncing...',error:'❌ Offline'}[s];
-      e.style.color={synced:'#27ae60',pending:'#f39c12',error:'#e74c3c'}[s];
-    }
-    async function load(){upd('pending'); if(!online){prog=JSON.parse(localStorage.getItem("prog")||"{}");return;}try{const r=await fetch(API+BIN+'/latest',{headers:{'X-Master-Key':KEY}});if(!r.ok)throw r;prog=(await r.json()).record||{};localStorage.setItem("prog",JSON.stringify(prog));upd('synced')}catch{x=>{prog=JSON.parse(localStorage.getItem("prog")||"{}");upd('error')}}}
-    async function save(){if(!online){localStorage.setItem("prog",JSON.stringify(prog));return;}try{const r=await fetch(API+BIN,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':KEY,'X-Bin-Versioning':false},body:JSON.stringify(prog)});if(!r.ok)throw r;localStorage.setItem("prog",JSON.stringify(prog));upd('synced')}catch{x=>{localStorage.setItem("prog",JSON.stringify(prog));upd('error')}}}
+    function upd(s){ const e=document.getElementById('sync-status'); e.textContent={synced:'☁️ Synced',pending:'⏳ Syncing...',error:'❌ Offline'}[s]; e.style.color={synced:'#27ae60',pending:'#f39c12',error:'#e74c3c'}[s]; }
+    async function load(){ upd('pending'); if(!online){ prog=JSON.parse(localStorage.getItem("prog")||"{}"); return;} try{ const r=await fetch(`${API}${BIN}/latest`,{headers:{'X-Master-Key':KEY}}); if(!r.ok) throw r; prog=(await r.json()).record||{}; localStorage.setItem("prog",JSON.stringify(prog)); upd('synced'); } catch{ prog=JSON.parse(localStorage.getItem("prog")||"{}"); upd('error'); } }
+    async function save(){ if(!online){ localStorage.setItem("prog",JSON.stringify(prog)); return;} try{ const r=await fetch(API+BIN,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':KEY,'X-Bin-Versioning':false},body:JSON.stringify(prog)}); if(!r.ok) throw r; localStorage.setItem("prog",JSON.stringify(prog)); upd('synced'); } catch{ localStorage.setItem("prog",JSON.stringify(prog)); upd('error'); } }
 
     function render(){
-      openSections=[];document.querySelectorAll('.collapsible').forEach((b,i)=>{if(b.nextElementSibling.style.display==='block')openSections.push(i)});
-      const c=document.getElementById('calendar-container');c.innerHTML='';let total=0,done=0;
+      openSections=[]; document.querySelectorAll('.collapsible').forEach((b,i)=>{ if(b.nextElementSibling.style.display==='block') openSections.push(i); });
+      const c=document.getElementById('calendar-container'); c.innerHTML=''; let total=0, done=0;
       calendar.forEach(wk=>{
-        const btn=document.createElement('button');btn.className='collapsible';btn.textContent=`Week ${wk.week} - ${wk.range}`;
-        const sec=document.createElement('div');sec.className='content week';
+        const btn=document.createElement('button'); btn.className='collapsible'; btn.textContent=`Week ${wk.week} - ${wk.range}`;
+        const sec=document.createElement('div'); sec.className='content week';
         wk.days.forEach(d=>{
           let html=`<div class="day"><div class="day-header">${d.day} (${d.date})</div>`;
           const groups={
@@ -134,50 +126,63 @@
             "Skill Practice":d.ex.filter(e=>skills.includes(e)),
             "Eccentric Program":d.ex.filter(e=>eccA.concat(eccB).includes(e))
           };
-          for(const [title,exs] of Object.entries(groups)){
+          for(const [title, exs] of Object.entries(groups)){
             if(exs.length){
               html+=`<h3>${title}</h3><div class="tracking">`;
               exs.forEach(ex=>{
                 const id=`${d.date}-${ex.replace(/ /g,"_")}`;
                 if(heavyLower.concat(heavyUpper).includes(ex)){
-                  // heavy row
-                  total+=5;['weight','rep1','rep2','rep3','rpe'].forEach(f=>prog[id]?.[f]&&done++);
-                  html+=`<div class="tracking-row"><label>${ex}</label>
+                  total+=5; ['done','weight','rep1','rep2','rep3','rpe'].forEach(f=>prog[id]?.[f] && done++);
+                  html+=`<div class="tracking-row">
+                    <input type="checkbox" onchange="set('${id}','done',this.checked)" ${prog[id]?.done?'checked':''}/>
+                    <label>${ex}</label>
                     Wt:<input type="number" onchange="set('${id}','weight',this.value)" value="${prog[id]?.weight||''}"/>
-                    Set1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
-                    Set2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
-                    Set3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
+                    1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
+                    2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
+                    3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
                     RPE:<input type="number" onchange="set('${id}','rpe',this.value)" value="${prog[id]?.rpe||''}"/>
                   </div>`;
                 } else {
-                  total+=3;['rep1','rep2','rep3'].forEach(f=>prog[id]?.[f]&&done++);
-                  html+=`<div class="tracking-row"><label>${ex}</label>
-                    <input type="number" placeholder="1" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
-                    <input type="number" placeholder="2" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
-                    <input type="number" placeholder="3" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
+                  total+=4; ['done','rep1','rep2','rep3'].forEach(f=>prog[id]?.[f] && done++);
+                  html+=`<div class="tracking-row">
+                    <input type="checkbox" onchange="set('${id}','done',this.checked)" ${prog[id]?.done?'checked':''}/>
+                    <label>${ex}</label>
+                    1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
+                    2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
+                    3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
                   </div>`;
                 }
               });
               html+='</div>';
             }
           }
-          html+='</div>';sec.innerHTML+=html;
+          html+='</div>'; sec.innerHTML+=html;
         });
-        c.appendChild(btn);c.appendChild(sec);
+        c.appendChild(btn); c.appendChild(sec);
       });
       const pct=total?Math.round(done/total*100):0;
       document.getElementById('progress-text').innerText=`${pct}%`;
       document.getElementById('progress-fill').style.width=`${pct}%`;
-      document.querySelectorAll('.collapsible').forEach((b,i)=>{b.addEventListener('click',()=>{const n=b.nextElementSibling;n.style.display=n.style.display==='block'?'none':'block'});if(openSections.includes(i))b.nextElementSibling.style.display='block'});
+      document.querySelectorAll('.collapsible').forEach((b,i)=>{ b.addEventListener('click',()=>{ const n=b.nextElementSibling; n.style.display=n.style.display==='block'?'none':'block'; }); if(openSections.includes(i)) b.nextElementSibling.style.display='block'; });
     }
 
-    function set(id,f,v){prog[id]=prog[id]||{};prog[id][f]=v;render();save();}
+    function set(id, field, val){
+      prog[id] = prog[id]||{};
+      prog[id][field] = field==='done'? val:true*val;
+      render();
+      save();
+    }
 
-    function exportLog(){let t='Training Log\n\n';for(const k in prog)t+=`${k}: ${JSON.stringify(prog[k])}\n`;const b=new Blob([t],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='training-log.txt';a.click();URL.revokeObjectURL(u);}
+    function exportLog(){
+      let t='Training Log\n\n';
+      for(const k in prog) t+=`${k}: ${JSON.stringify(prog[k])}\n`;
+      const b=new Blob([t],{type:'text/plain'}), u=URL.createObjectURL(b), a=document.createElement('a');
+      a.href=u; a.download='training-log.txt'; a.click(); URL.revokeObjectURL(u);
+    }
 
-    window.addEventListener('online',()=>{online=true;save()});
-    window.addEventListener('offline',()=>{online=false;upd('error')});
-    document.addEventListener('DOMContentLoaded',async()=>{await load();render()});
+    window.addEventListener('online',()=>{ online=true; save(); });
+    window.addEventListener('offline',()=>{ online=false; upd('error'); });
+    document.addEventListener('DOMContentLoaded', async ()=>{ await load(); render(); });
   </script>
 </body>
 </html>
