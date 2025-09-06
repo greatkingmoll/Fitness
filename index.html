@@ -216,6 +216,44 @@
       const b=new Blob([t],{type:'text/plain'}), u=URL.createObjectURL(b), a=document.createElement('a');
       a.href=u; a.download='training-log.txt'; a.click(); URL.revokeObjectURL(u);
     }
+    // Add this near the end of your script, before the existing event listeners
+
+// Sync from cloud when window regains focus (prevents stale data overwrites)
+    let lastFocusTime = Date.now();
+    
+    window.addEventListener('focus', async () => {
+      const timeSinceFocus = Date.now() - lastFocusTime;
+      
+      // Only sync if window was unfocused for more than 30 seconds
+      // This prevents excessive syncing from brief tab switches
+      if (timeSinceFocus > 30000) {
+        console.log('Window regained focus after', Math.round(timeSinceFocus/1000), 'seconds - syncing from cloud');
+        upd('pending');
+        await load(); // Refresh data from cloud
+        render(); // Re-render with fresh data
+      }
+      
+      lastFocusTime = Date.now();
+    });
+    
+    window.addEventListener('blur', () => {
+      lastFocusTime = Date.now();
+    });
+    
+    // Optional: Add periodic sync every 5 minutes for long-running sessions
+    setInterval(async () => {
+      if (document.hidden) return; // Don't sync if tab is not visible
+      
+      console.log('Periodic sync check...');
+      const currentData = JSON.stringify(prog);
+      await load(); // Get latest from cloud
+      const newData = JSON.stringify(prog);
+      
+      if (currentData !== newData) {
+        console.log('Data updated from cloud during periodic sync');
+        render(); // Re-render if data changed
+      }
+    }, 5 * 60 * 1000); // Every 5 minutes
 
     window.addEventListener('online',()=>{ online=true; save(); });
     window.addEventListener('offline',()=>{ online=false; upd('error'); });
