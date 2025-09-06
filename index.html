@@ -216,6 +216,33 @@
       const b=new Blob([t],{type:'text/plain'}), u=URL.createObjectURL(b), a=document.createElement('a');
       a.href=u; a.download='training-log.txt'; a.click(); URL.revokeObjectURL(u);
     }
+	function fetchLatestData() {
+	  fetch('/path/to/data.json', {
+		cache: 'no-store'          // prevents any caching
+	  })
+		.then(response => response.json())
+		.then(data => {
+		  // handle your fresh data
+		  console.log('Fetched fresh data:', data);
+		})
+		.catch(err => console.error('Fetch error:', err));
+	}
+
+	// Initial load
+	fetchLatestData();
+
+	// Re-fetch when window/tab gains focus
+	window.addEventListener('focus', fetchLatestData);
+	
+	function fetchLatestData() {
+	  const ts = Date.now();
+	  fetch(`/path/to/data.json?ts=${ts}`, {
+		cache: 'no-store'
+	  })
+		.then(res => res.json())
+		.then(data => { /* … */ });
+	}
+
 
     window.addEventListener('online',()=>{ online=true; save(); });
     window.addEventListener('offline',()=>{ online=false; upd('error'); });
