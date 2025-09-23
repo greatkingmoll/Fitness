@@ -392,11 +392,18 @@
     }
 
     function set(id, field, val){
-      prog[id] = prog[id]||{};
-      prog[id][field] = field==='done'? val : (val === '' ? null : Number(val));
+      prog[id] = prog[id] || {};
+      if (field === 'done') {
+        prog[id][field] = val;
+      } else if (field === 'note') {
+        prog[id][field] = val; // Store the note as plain text
+      } else {
+        prog[id][field] = val === '' ? null : Number(val); // For numbers
+      }
       render();
       saveToServer();
     }
+
 
     function exportLog(){
       let t='Training Log\\n\\n';
