@@ -158,11 +158,17 @@
         // Add more exercises and their video links here as needed
         // "Exercise Name": "URL"
       };
-      
+
+      const exerciseDescriptions = {
+        "Hip 90/90 Stretch": "90/90 hip rotations improve both hip and lumbar mobility; perform slow transitions between sides."
+        // more descriptions here
+      };
       if (exerciseLinks[exerciseName]) {
-        return `<a href="${exerciseLinks[exerciseName]}" target="_blank">${exerciseName}</a>`;
+        // Hotlink with tooltip
+        return `<a href="${exerciseLinks[exerciseName]}" target="_blank" title="${description}">${exerciseName}</a>`;
       }
-      return exerciseName;
+      // Plain text with tooltip
+      return `<span title="${description}">${exerciseName}</span>`;
     }
 
     // Generate calendar
