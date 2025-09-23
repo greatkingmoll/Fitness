@@ -163,7 +163,9 @@
         "Hip 90/90 Stretch": "90/90 hip rotations improve both hip and lumbar mobility; perform slow transitions between sides."
         // more descriptions here
       };
-      if (exerciseLinks[exerciseName]) {
+     
+     const description = exerciseDescriptions[exerciseName] || "";
+     if (exerciseLinks[exerciseName]) {
         // Hotlink with tooltip
         return `<a href="${exerciseLinks[exerciseName]}" target="_blank" title="${description}">${exerciseName}</a>`;
       }
