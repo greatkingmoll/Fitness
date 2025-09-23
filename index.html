@@ -353,6 +353,7 @@
                     2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
                     3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
                     RPE:<input type="number" onchange="set('${id}','rpe',this.value)" value="${prog[id]?.rpe||''}"/>
+                    <input type="text" placeholder="Notes" onchange="set('${id}','note',this.value)" value="${prog[id]?.note||''}" style="margin-left:10px;width:120px;">
                   </div>`;
                 } else {
                   total+=4; 
@@ -363,6 +364,7 @@
                     1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
                     2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
                     3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
+                    <input type="text" placeholder="Notes" onchange="set('${id}','note',this.value)" value="${prog[id]?.note||''}" style="margin-left:10px;width:120px;">
                   </div>`;
                 }
               });
