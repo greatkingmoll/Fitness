@@ -26,6 +26,32 @@
     .conflict-warning { background:#fff3cd; border:1px solid #ffeaa7; color:#856404; padding:10px; border-radius:4px; margin:10px 0; }
     .tracking-row label a { color: #2c3e50; text-decoration: none; }
     .tracking-row label a:hover { color: #27ae60; text-decoration: underline; }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    
+    .tooltip .tooltip-image {
+      visibility: hidden;
+      width: 250px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1000;
+      top: 125%; 
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .tooltip:hover .tooltip-image {
+      visibility: visible;
+    }
+
   </style>
 </head>
 <body>
@@ -391,7 +417,13 @@
                     1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
                     2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
                     3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
-                    RPE:<input type="number" onchange="set('${id}','rpe',this.value)" value="${prog[id]?.rpe||''}"/>
+                    <label class="tooltip">
+                      RPE
+                      <span class="tooltip-image">
+                        <img src="https://images.squarespace-cdn.com/content/v1/6424c52965e3355f1f7b6214/b52280b0-658b-4338-a3de-d0b69b0a0056/rate_of_perceived_exertion_scale.jpg?format=2500w" alt="RPE Scale" style="width: 100%; border-radius: 6px;">
+                      </span>
+                    </label>:
+                    <input type="number" onchange="set('${id}','rpe',this.value)" value="${prog[id]?.rpe||''}"/>
                     <input type="text" placeholder="Notes" onchange="set('${id}','note',this.value)" value="${prog[id]?.note||''}" style="margin-left:10px;width:120px;">
                   </div>`;
                 } else {
