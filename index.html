@@ -156,7 +156,15 @@
     const BIN='68b792b243b1c97be934fbf5', KEY='$2a$10$xw2r19X4duqK08padyE3rOwnbACLQJTQhuk2rLK1ooSWJ1N8xJ.MW', API='https://api.jsonbin.io/v3/b/';
     const start=new Date("2025-09-08");
     const micro=["Wall Sit","Push-ups","Seated Band Row","Hip Hinge Drill","Plank w/ Shoulder Taps","Standing Calf Raises","Split Squat","Chair Dips","Banded Rear Delt Pulls","Glute Bridge March","Incline Push-ups","Lateral Band Walk","Single-Leg RDL","Hollow-Body Hold","Banded Overhead Press"];
-    const skills=["DNS Breathing","Bear Crawl Hold","Bird Dog","Hip 90/90 Stretch","Bodyweight Squat Practice","Wall Slides","Band Pull-aparts","Single-Leg Stand Eyes Closed","Cat-Cow","Ankle Mobilization"];
+    // const skills=["DNS Breathing","Bear Crawl Hold","Bird Dog","Hip 90/90 Stretch","Bodyweight Squat Practice","Wall Slides","Band Pull-aparts","Single-Leg Stand Eyes Closed","Cat-Cow","Ankle Mobilization"];
+    const skills = [
+      ["DNS Breathing","Bear Crawl Hold"],      // Index 0
+      ["Bird Dog","Hip 90/90 Stretch"],        // Index 1  
+      ["Bodyweight Squat Practice","Wall Slides"], // Index 2
+      ["Band Pull-aparts","Single-Leg Stand Eyes Closed"],          // Index 3
+      ["Ankle Mobilization", "Cat-Cow"]                   // Index 4
+    ]
+
     const eccA=["Negative Pull-ups","Nordic Hamstring Curls","Eccentric Push-ups"], eccB=["Step-Down Negatives","Single-Leg RDL Negative","Negative Pull-ups"];
     const heavyLower=["Deadlift","Goblet Squat","Farmer's Carry"], heavyUpper=["Assisted Pull-ups","Push-up Variant"];
     
@@ -243,7 +251,7 @@
         if(idx===1){ ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]); }
         // Tuesday (idx===2)
         else if(idx===2){for(let i=3;i<6;i++) ex.push(micro[(w*3+i)%15]);
-          ex.push(...skills.slice(w%skills.length, w%skills.length+2));  // FIXED
+          ex.push(...push(...skills[w % skills.length]);  // FIXED
         }
         // Wednesday (idx===3) 
         else if(idx===3){
@@ -253,7 +261,7 @@
         // Thursday (idx===4)
         else if(idx===4){
           for(let i=9;i<12;i++) ex.push(micro[(w*3+i)%15]);
-          ex.push(...skills.slice((w+1)%skills.length, (w+1)%skills.length+2));  // FIXED
+          ex.push(...skills[(w+1) % skills.length]);  // FIXED
         }
         // Friday (idx===5)
         else if(idx===5){
@@ -262,7 +270,7 @@
         }
         // Saturday (idx===6)
         else if(idx===6){
-          ex.push(...skills.slice((w+2)%skills.length, (w+2)%skills.length+2));  // FIXED
+          ex.push(...skills[(w+2) % skills.length]);  // FIXED
         }
         days.push({day:names[idx],date,ex});
       }
