@@ -423,7 +423,7 @@
           const groups={
             "Heavy Lifting":d.ex.filter(e=>heavyLower.concat(heavyUpper).includes(e)),
             "Micro-Workout":d.ex.filter(e=>micro.includes(e)),
-            "Skill Practice":d.ex.filter(e=>skills.includes(e)),
+            "Skill Practice": d.ex.filter(e => skills.flat().includes(e)),
             "Eccentric Program":d.ex.filter(e=>eccA.concat(eccB).includes(e))
           };
           
