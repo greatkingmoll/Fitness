@@ -164,7 +164,6 @@
       ["Band Pull-aparts","Single-Leg Stand Eyes Closed"],          // Index 3
       ["Ankle Mobilization", "Cat-Cow"]                   // Index 4
     ]
-
     const eccA=["Negative Pull-ups","Nordic Hamstring Curls","Eccentric Push-ups"], eccB=["Step-Down Negatives","Single-Leg RDL Negative","Negative Pull-ups"];
     const heavyLower=["Deadlift","Goblet Squat","Farmer's Carry"], heavyUpper=["Assisted Pull-ups","Push-up Variant"];
     
@@ -251,7 +250,7 @@
         if(idx===1){ ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]); }
         // Tuesday (idx===2)
         else if(idx===2){for(let i=3;i<6;i++) ex.push(micro[(w*3+i)%15]);
-          ex.push(...push(...skills[w % skills.length]);  // FIXED
+          ex.push(...push(...skills[(w*3) % skills.length]);  // FIXED
         }
         // Wednesday (idx===3) 
         else if(idx===3){
@@ -261,7 +260,7 @@
         // Thursday (idx===4)
         else if(idx===4){
           for(let i=9;i<12;i++) ex.push(micro[(w*3+i)%15]);
-          ex.push(...skills[(w+1) % skills.length]);  // FIXED
+          ex.push(...skills[(w*3+1) % skills.length]);  // FIXED
         }
         // Friday (idx===5)
         else if(idx===5){
@@ -270,7 +269,7 @@
         }
         // Saturday (idx===6)
         else if(idx===6){
-          ex.push(...skills[(w+2) % skills.length]);  // FIXED
+          ex.push(...skills[(w*3+2) % skills.length]);  // FIXED
         }
         days.push({day:names[idx],date,ex});
       }
