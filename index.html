@@ -251,7 +251,7 @@
       for(let d=0;d<7;d++){
         const s0 = (w*3) %skills.length;
         const dt=new Date(start); dt.setDate(start.getDate()+w*7+d);
-        const dd=String(dt.getDate()).padStart(2,"0"), mon=dt.toLocaleDateString("en-GB",{month:"short",year:"2-digit"});
+        const dd=String(dt.getDate()).padStart(2,"0"), monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], mon=`${monthNames[dt.getMonth()]} ${String(dt.getFullYear()%100).padStart(2,"0")}`;
         const date=`${dd}-${mon}`, idx=dt.getDay(), names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
         let ex=[];
         if(idx===1){ ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]); }
