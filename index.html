@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="/Fitness/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/Fitness/favicon.svg" />
+  <link rel="shortcut icon" href="/Fitness/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/Fitness/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Exercise Tracker" />
+  <link rel="manifest" href="/Fitness/site.webmanifest" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>10-Week Training Calendar</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:800px; margin:auto; padding:20px; background:#f5f5f5; }
+    h1,h2,h3 { color:#2c3e50; }
+    .section, .controls { background:#fff; margin-bottom:20px; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+    .controls { position:sticky; top:20px; }
+    button { margin:5px; padding:8px 16px; border:none; background:#27ae60; color:#fff; border-radius:4px; cursor:pointer; }
+    button:hover { background:#219651; }
+    .progress-bar { background:#ecf0f1; border-radius:10px; overflow:hidden; height:20px; margin:10px 0; }
+    .progress-fill { background:#27ae60; height:100%; width:0; transition:width .3s; }
+    .collapsible { cursor:pointer; padding:10px; background:#2c3e50; color:#fff; border:none; width:100%; text-align:left; border-radius:4px; margin-bottom:10px; }
+    .content { display:none; overflow:hidden; }
+    .week { margin-bottom:10px; }
+    .day { background:#fafafa; margin:8px 0; padding:10px; border-radius:4px; }
+    .day-header { font-weight:bold; margin-bottom:6px; }
+    .tracking { margin-bottom:10px; }
+    .tracking-row { display:flex; align-items:center; margin-bottom:6px; }
+    .tracking-row input[type="checkbox"] { transform:scale(1.2); margin-right:8px; }
+    .tracking-row label { width:120px; }
+    .tracking-row input[type="number"] { width:50px; margin-left:8px; padding:4px; }
+    .conflict-warning { background:#fff3cd; border:1px solid #ffeaa7; color:#856404; padding:10px; border-radius:4px; margin:10px 0; }
+    .tracking-row label a { color: #2c3e50; text-decoration: none; }
+    .tracking-row label a:hover { color: #27ae60; text-decoration: underline; }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    
+    .tooltip .tooltip-image {
+      visibility: hidden;
+      width: 250px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1000;
+      top: 125%; 
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .tooltip:hover .tooltip-image {
+      visibility: visible;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>10-Week Training Calendar</h1>
+
+  <button class="collapsible">Exercise Reference & Form Cues</button>
+  <div class="content section">
+     <h2>Office Micro-Workouts</h2>
+    <div class="exercise-item"><b>Wall Sit</b> Back flat, knees at 90°, brace core. <b>(3x 30-45 sec)</b></div>
+    <div class="exercise-item"><b>Push-ups</b> Hands under shoulders, full range, core tight. <b>(3x 8-12 reps)</b></div>
+    <div class="exercise-item"><b>Seated Band Row</b> Anchor band, hinge hips, retract scapula. <b>(3x 12-15 reps)</b></div>
+    <div class="exercise-item"><b>Hip Hinge Drill</b> Hinge at hips, neutral spine. <b>(3x 8-10 reps)</b></div>
+    <div class="exercise-item"><b>Plank w/ Shoulder Taps</b> Hips stable, tap opposite shoulder. <b>(3x 20 taps)</b></div>
+    <div class="exercise-item"><b>Standing Calf Raises</b> Pause at top, control down. <b>(3x 15-20 reps)</b></div>
+    <div class="exercise-item"><b>Split Squat</b> Rear foot elevated, front thigh parallel. <b>(3x 8-10/leg)</b></div>
+    <div class="exercise-item"><b>Chair Dips</b> Elbows back, lean forward. <b>(3x 8-12 reps)</b></div>
+    <div class="exercise-item"><b>Seated Banded Rear Delt Pulls</b> Pull elbows back at shoulder height, focus on squeeing shoulder blades. <b>(3x 12-15 reps)</b></div>
+    <div class="exercise-item"><b>Glute Bridge March</b> Hips high, alternate knee drive. <b>(3x 20 marches)</b></div>
+    <div class="exercise-item"><b>Incline Push-ups</b> Hands on desk, core braced. <b>(3x 8-12 reps)</b></div>
+    <div class="exercise-item"><b>Lateral Band Walk</b> Band above knees, small steps. <b>(3x 12-15 steps)</b></div>
+    <div class="exercise-item"><b>Single-Leg RDL</b> Hinge on one leg, spine neutral. <b>(3x 8-10/leg)</b></div>
+    <div class="exercise-item"><b>Hollow-Body Hold</b> Lower back pressed, legs & arms off floor. <b>(3x 20-30 sec)</b></div>
+    <div class="exercise-item"><b>Banded Overhead Press</b> Stand on band, press overhead. <b>(3x 10-12 reps)</b></div>
+    <br>
+    <div class="exercise-item"><b>Pallof Press</b> Press away, resist rotation. <b>(3x10-12/side)</b> ***replaced by Band Rear Delt Pulls</div>
+    
+    <h3> Progressive Overload</h3>
+    <ul>
+      <li>Each week, aim to increase difficulty by adding 1-2 reps, extending hold times by 5-10 seconds or using a stronger band</li>
+    </ul>
+    
+    <h2>Skill Practice</h2>
+    <h3>Stability & DNS</h3>
+    <div class="exercise-item"><b>DNS Breathing</b> 5×30s diaphragmatic with brace.</div>
+    <div class="exercise-item"><b>Bear Crawl Hold</b> Hands under shoulders, knees under hips, back flat. <b>(Hold 20-40 secs, 3-5 times)</b></div>
+    <div class="exercise-item"><b>Bird Dog</b> Extend opposite arm/leg, hold 2-3s. <b>(8-10 reps per side)</b></div>
+    <br>
+    <div class="exercise-item"><b>Single-Leg Stand Eyes Closed</b> Stand on one foot, arms at sides. Hold 30-60 seconds, 2-3x each leg. Progress by closing eyes.</div>
+    
+    <h3>Compound Lift Technique Practice</h3>
+    <div class="exercise-item"><b>Bodyweight Squat Practice</b> Slow 3s down, full depth.<b> (3x 10 reps)</b></div>
+    <div class="exercise-item"><b>Wall Slides</b> Back & arms on wall, elbows 90 to start, slide overhead, keeping writst/elbows/tailbone on wall. <b>(10 reps, focussing on should mobility and posture)</b></div>
+    <br>
+    <div class="exercise-item"><b>Unilateral Lower Body Practice (Lunge) </b> Step one leg back into split stance, lower until front thigh is prallel, keeping torso upgright <b>(3x 6-8 reps per side)</b> *** variation for split squat</div>
+    <div class="exercise-item"><b>Hip Hinge Drill </b> Stand tall, feet hip-width, place stick along spine (touching head, upper back, tailbone). <b>(3x10 reps maintaining contact points)</b> *** Variation for hip hinge drill</div>
+    
+        <h3>Mobility & Pre-hab</h3>
+    <div class="exercise-item"><b>Hip 90/90 Stretch</b> Rotate knees, pause each side. <b>(10 slow transitions)</b></div>
+    <div class="exercise-item"><b>Band Pull-aparts</b> Pull band apart until arms are outstretched, squeeze scapula, slow return.<b> (10-15 reps)</b></div>
+    <div class="exercise-item"><b>Cat-Cow</b> Alternate arch & sag, mobilize spine. <b>(Move slowly 10-15 rounds)</b></div>
+    <div class="exercise-item"><b>Ankle Mobilization</b> Knee to wall, heel down. <b>(8-10 reps each side)</b></div>
+    <br>
+    <div class="exercise-item"><b>Thoracic Spine Openers (Threat the Needle)</b> From quaddruped, reach one arm under body, lowering shoulder to floor. <b>(6-8 reps per side)</b> *** not currently included</div>
+
+    <h2>Eccentric Program</h2>
+    <div class="exercise-item"><b>Negative Pull-ups</b> 5s descent, control lowering. <b>(3x 3-5, Jump or step up to start)</b></div>
+    <div class="exercise-item"><b>Nordic Hamstring Curls</b> 4-5s negative. <b>(3 x3-5, band assisted)</b></div>
+    <div class="exercise-item"><b>Step-Down Negatives</b> 3s descent from 18" box. <b>(3x 8-10/leg)</b></div>
+    <div class="exercise-item"><b>Eccentric Push-ups</b> 4s lower, feet elevated. <b>(3x 5-8, 4-second lowering, elevate feet if needed)</b></div>
+    <div class="exercise-item"><b>Single-Leg RDL Negative</b> 3s hinge descent. <b>(3x 6-8/leg)</b></div>
+    <h3>Eccentric Programming Notes:</h3>
+    <ul>
+      <li>Progress by increasing time uinder tension, not just load</li>
+      <li>Focus on <b>control</b> rather than maximum resistance</li>
+    </ul>
+
+    <h2>Heavy Lifting</h2>
+    <div class="exercise-item"><b>Deadlift</b> Neutral spine, bar close, drive hips. (4x 3-5 reps, 80-85% 1RM, 3-4 min rest)</div>
+    <div class="exercise-item"><b>Goblet Squat</b> Chest up, depth to parallel. (3x 5-8 reps, 70-80% 1RM, 2-3 min rest)</div>
+    <div class="exercise-item"><b>Farmer's Carry</b> Brace core, steady pace. (3x 30-60 sec, 75-100% Body Weight, 2 min rest)</div>
+    <div class="exercise-item"><b>Assisted Pull-ups</b> Full range, scapula retracted. (3x 5-8, Body Weight + assistance, 2-3 min rest)</div>
+    <div class="exercise-item"><b>Push-up Variant</b> Full depth, core tight. (3x 8-12, progressive difficulty, 90 sec rest)</div>
+    <h3>Progressive Loading</h3>
+    <ul>
+      <li><b>Deadlift Goal:</b> Work up to bodyweight for 10 clean reps</li>
+      <li><b>Farmer's Carry Goal:</b> Carry total bodyweight (split between hands) for 1+ minute</li>
+      <li><b>Pull-up Goal:</b> Dead hang for 2 minutes (at age 40, reducing slightly per decade)</li>
+    </ul>
+    <h3>Key Form Priorities</h3>
+    <ul>
+      <li><b>Eccentric Control:</b> 2-3 second lowering phase on all lifts</li>
+      <li><b>Full Range of Motion:</b> Emphasize complete muscle lengthening</li>
+      <li><b>Intra-abdominal Pressure:</b> Proper bracing and breathing technique</li>
+      <li><b>Progressive Overload:</b> Increase load by 2.5-5lbs weekly, or add 1 rep when form is perfect</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div>Progress: <span id="progress-text">0%</span> <span id="sync-status">⏳ Loading...</span></div>
+    <button onclick="exportLog()">Export Log</button>
+    <button onclick="refreshFromServer()">🔄 Refresh</button>
+  </div>
+
+  <div id="conflict-warning" class="conflict-warning" style="display:none;">
+    ⚠️ External changes detected. <button onclick="resolveConflict('server')">Use Server Data</button> <button onclick="resolveConflict('local')">Keep Local Changes</button>
+  </div>
+
+  <div id="calendar-container"></div>
+
+  <script>
+    const BIN='68b792b243b1c97be934fbf5', KEY='$2a$10$xw2r19X4duqK08padyE3rOwnbACLQJTQhuk2rLK1ooSWJ1N8xJ.MW', API='https://api.jsonbin.io/v3/b/';
+    const start=new Date("2025-09-08");
+    const micro=["Wall Sit","Push-ups","Seated Band Row","Hip Hinge Drill","Plank w/ Shoulder Taps","Standing Calf Raises","Split Squat","Chair Dips","Banded Rear Delt Pulls","Glute Bridge March","Incline Push-ups","Lateral Band Walk","Single-Leg RDL","Hollow-Body Hold","Banded Overhead Press"];
+    // const skills=["DNS Breathing","Bear Crawl Hold","Bird Dog","Hip 90/90 Stretch","Bodyweight Squat Practice","Wall Slides","Band Pull-aparts","Single-Leg Stand Eyes Closed","Cat-Cow","Ankle Mobilization"];
+    const skills = [
+      ["DNS Breathing","Bear Crawl Hold"],      // Index 0
+      ["Bird Dog","Hip 90/90 Stretch"],        // Index 1  
+      ["Bodyweight Squat Practice","Wall Slides"], // Index 2
+      ["Band Pull-aparts","Single-Leg Stand Eyes Closed"],          // Index 3
+      ["Ankle Mobilization", "Cat-Cow"]                   // Index 4
+    ]
+    const eccA=["Negative Pull-ups","Nordic Hamstring Curls","Eccentric Push-ups"], eccB=["Step-Down Negatives","Single-Leg RDL Negative","Negative Pull-ups"];
+    const heavyLower=["Deadlift","Goblet Squat","Farmer's Carry"], heavyUpper=["Assisted Pull-ups","Push-up Variant"];
+    
+   function getExerciseLabel(exerciseName) {
+      const exerciseLinks = {
+        "Hip 90/90 Stretch": "https://www.youtube.com/watch?v=f_7qIPxw6nE",
+        "Glute Bridge March": "https://www.youtube.com/watch?v=4LQUPybxCnI",
+        "Banded Overhead Press": "https://www.youtube.com/watch?v=Zli1UXH9ZeE",
+        "Seated Band Row": "https://www.youtube.com/watch?v=Jy-WCFAofBY",
+        "Hollow-Body Hold": "https://www.youtube.com/watch?v=BQCdzRPE9Ao",
+        "Single-Leg RDL": "https://www.youtube.com/watch?v=3dz78X166LI",
+        "Single-Leg RDL Negative": "https://www.youtube.com/watch?v=3dz78X166LI",
+        "Band Pull-aparts": "https://www.youtube.com/watch?v=MnDpmNYUjbc",
+        "Banded Rear Delt Pulls": "https://www.youtube.com/watch?v=fkNjDxTdrvE",
+        "Bodyweight Squat Practice": "https://www.youtube.com/watch?v=l83R5PblSMA",
+        "Hip Hinge Drill": "https://www.youtube.com/watch?v=mg35BfA-0ZM",
+        "Split Squat": "https://www.youtube.com/watch?v=2C-uNgKwPLE",
+        "Chair Dips": "https://www.youtube.com/shorts/9llvBAV4RHI",
+        "Lateral Band Walk": "https://www.youtube.com/watch?v=RW4ZvH22l48",
+        "Nordic Hamstring Curls": "https://www.youtube.com/shorts/o40Zd3WRbxg",
+        "Goblet Squat": "https://www.youtube.com/watch?v=MeIiIdhvXT4",
+        "Hollow-Body Hold": "https://www.youtube.com/watch?v=BQCdzRPE9Ao",
+        "Deadlift": "https://www.youtube.com/watch?v=WzvsIU9FW60",
+        "Farmer's Carry": "https://www.youtube.com/watch?v=p5MNNosenJc",
+        // Add more exercises and their video links here as needed
+        // "Exercise Name": "URL"
+      };
+
+      const exerciseDescriptions = {
+        "Hip 90/90 Stretch": "Hip Hinge Drill Hinge at hips, neutral spine. (3x 8-10 reps)",
+        "Glute Bridge March": "Glute Bridge March Hips high, alternate knee drive. (3x 20 marches)",
+        "Banded Overhead Press": "Banded Overhead Press Stand on band, press overhead. (3x 10-12 reps)",
+        "Seated Band Row": "Seated Band Row Anchor band, hinge hips, retract scapula. (3x 12-15 reps)",
+        "Hollow-Body Hold": "Hollow-Body Hold Lower back pressed, legs & arms off floor. (3x 20-30 sec)",
+        "Single-Leg RDL": "Single-Leg RDL Hinge on one leg, spine neutral. (3x 8-10/leg)",
+        "Single-Leg RDL Negative": "Single-Leg RDL Negative 3s hinge descent. (3x 6-8/leg)",
+        "Band Pull-aparts": "Band Pull-aparts Pull band apart until arms are outstretched, squeeze scapula, slow return. (10-15 reps)",
+        "Banded Rear Delt Pulls": "Seated Banded Rear Delt Pulls Pull elbows back at shoulder height, focus on squeezing shoulder blades. (3x 12-15 reps)",
+        "Hip Hinge Drill": "Hip Hinge Drill Stand tall, feet hip-width, place stick along spine (touching head, upper back, tailbone).",
+        "Split Squat": "Split Squat Rear foot elevated, front thigh parallel. (3x 8-10/leg)",
+        "Chair Dips": "Chair Dips Elbows back, lean forward. (3x 8-12 reps)",
+        "Lateral Band Walk": "Lateral Band Walk Band above knees, small steps. (3x 12-15 steps)",
+        "Nordic Hamstring Curls": "Nordic Hamstring Curls 4-5s negative. (3 x3-5, band assisted)",
+        "Deadlift": "Deadlift Neutral spine, bar close, drive hips. (4x 3-5 reps, 80-85% 1RM, 3-4 min rest)",
+        "Goblet Squat": "Goblet Squat Chest up, depth to parallel. (3x 5-8 reps, 70-80% 1RM, 2-3 min rest)",
+        "Farmer's Carry": "Farmer's Carry Brace core, steady pace. (3x 30-60 sec, 75-100% Body Weight, 2 min rest)",
+        "Wall Sit": "Wall Sit Back flat, knees at 90°, brace core. (3x 30-45 sec)",
+        "Push-ups": "Push-ups Hands under shoulders, full range, core tight. (3x 8-12 reps)",
+        "Incline Push-ups": "Incline Push-ups Hands on desk, core braced. (3x 8-12 reps)",
+        "Eccentric Push-ups": "Eccentric Push-ups 4s lower, feet elevated. (3x 5-8, 4-second lowering, elevate feet if needed)",
+        "Step-Down Negatives": "Step-Down Negatives 3s descent from 18\" box. (3x 8-10/leg)",
+        "Negative Pull-ups": "Negative Pull-ups 5s descent, control lowering. (3x 3-5, Jump or step up to start)",
+        "Assisted Pull-ups": "Full range, scapula retracted. (3x 5-8, Body Weight + assistance, 2-3 min rest)",
+        "Push-up Variant": "Full depth, core tight. (3x 8-12, progressive difficulty, 90 sec rest)",
+        "DNS Breathing": "5×30s diaphragmatic with brace.",
+        "Bear Crawl Hold": "Hands under shoulders, knees under hips, back flat. (Hold 20-40 secs, 3-5 times)",
+        "Bird Dog": "Extend opposite arm/leg, hold 2-3s. (8-10 reps per side)",
+        "Bodyweight Squat Practice": "Slow 3s down, full depth. (3x 10 reps)",
+        "Wall Slides": "Back & arms on wall, elbows 90 to start, slide overhead, keeping writst/elbows/tailbone on wall. (10 reps, focussing on shoulder mobility and posture)",
+        "Cat-Cow": "Alternate arch & sag, mobilize spine. (Move slowly 10-15 rounds)",
+        "Ankle Mobilization": "Knee to wall, heel down. (8-10 reps each side)",
+        "Single-Leg Stand Eyes Closed": "Stand on one foot, arms at sides or on hips. Hold 30-60 seconds, 2-3x each leg. Progress by closing eyes.",
+        // more descriptions here
+      };
+     
+     const description = exerciseDescriptions[exerciseName] || "";
+     if (exerciseLinks[exerciseName]) {
+        // Hotlink with tooltip
+        return `<a href="${exerciseLinks[exerciseName]}" target="_blank" title="${description}">${exerciseName}</a>`;
+      }
+      // Plain text with tooltip
+      return `<span title="${description}">${exerciseName}</span>`;
+    }
+
+    // Generate calendar
+    const calendar=[];
+    for(let w=0;w<10;w++){
+      const days=[];
+      for(let d=0;d<7;d++){
+        const s0 = (w*3) %skills.length;
+        const dt=new Date(start); dt.setDate(start.getDate()+w*7+d);
+        const dd=String(dt.getDate()).padStart(2,"0"), monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], mon=`${monthNames[dt.getMonth()]} ${String(dt.getFullYear()%100).padStart(2,"0")}`;
+        const date=`${dd}-${mon}`, idx=dt.getDay(), names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        let ex=[];
+        if(idx===1){ ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]); }
+        // Tuesday (idx===2)
+        else if(idx===2){for(let i=3;i<6;i++) ex.push(micro[(w*3+i)%15]);
+          ex.push(...skills[s0]);  // FIXED
+        }
+        // Wednesday (idx===3) 
+        else if(idx===3){
+          for(let i=6;i<9;i++) ex.push(micro[(w*3+i)%15]);
+          ex.push(...(w%2?eccB:eccA));
+        }
+        // Thursday (idx===4)
+        else if(idx===4){
+          for(let i=9;i<12;i++) ex.push(micro[(w*3+i)%15]);
+          ex.push(...skills[(s0+1) % skills.length]);  // FIXED
+        }
+        // Friday (idx===5)
+        else if(idx===5){
+          ex=[...heavyUpper];
+          for(let i=12;i<15;i++) ex.push(micro[(w*3+i)%15]);
+        }
+        // Saturday (idx===6)
+        else if(idx===6){
+          ex.push(...skills[(s0+2) % skills.length]);  // FIXED
+        }
+        days.push({day:names[idx],date,ex});
+      }
+      calendar.push({week:w+1,range:`${days[1].date} - ${days[5].date}`,days});
+    }
+
+    let prog={}, serverTimestamp=0, localTimestamp=0, openSections=[], online=navigator.onLine, syncInterval;
+    
+    // Improved ID sanitization function - fixes Farmer's Carry bug
+    function sanitizeId(str) {
+      return str.replace(/[^a-zA-Z0-9]/g, "_");
+    }
+    
+    function upd(s){ 
+      const e=document.getElementById('sync-status'); 
+      e.textContent={synced:'☁️ Synced',pending:'⏳ Syncing...',error:'❌ Offline'}[s]; 
+      e.style.color={synced:'#27ae60',pending:'#f39c12',error:'#e74c3c'}[s]; 
+    }
+    
+      async function loadFromServer(skipConflictCheck = false){ 
+      upd('pending'); 
+      
+      // Always attempt server fetch first, regardless of navigator.onLine status
+      try{ 
+        const r = await fetch(`${API}${BIN}/latest`, {
+          headers: {
+            'X-Master-Key': KEY,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          },
+          cache: 'no-store'
+        });
+        
+        if(!r.ok) throw new Error(`HTTP ${r.status}`); 
+        
+        const response = await r.json();
+        const serverData = response.record || {};
+        const newServerTimestamp = serverData._timestamp || Date.now();
+        
+        // Check for conflicts (external changes while we had local changes)
+        if(!skipConflictCheck && localTimestamp > 0 && serverTimestamp > 0 && newServerTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
+          // Show conflict resolution UI
+          document.getElementById('conflict-warning').style.display = 'block';
+          window.conflictData = {server: serverData, local: prog, serverTimestamp: newServerTimestamp};
+          return;
+        }
+        
+        prog = serverData.data || {};
+        serverTimestamp = newServerTimestamp;
+        localTimestamp = Date.now();
+        
+        // Update backup
+        localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
+        upd('synced'); 
+        
+      } catch(error){ 
+        console.warn('Server fetch failed, using backup:', error);
+        // Only use backup if server fetch actually fails
+        const stored = localStorage.getItem("prog_backup");
+        if(stored) {
+          const backup = JSON.parse(stored);
+          prog = backup.data || {};
+          localTimestamp = backup.timestamp || 0;
+        }
+        upd('error'); 
+      } 
+    }
+   
+    async function saveToServer(){ 
+      localTimestamp = Date.now();
+      
+      // Always update local backup first
+      localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
+      
+      if(!online){ 
+        upd('error');
+        return;
+      } 
+      
+      try{ 
+        const dataToSave = {
+          data: prog,
+          _timestamp: localTimestamp
+        };
+        
+        const r = await fetch(API+BIN, {
+          method:'PUT',
+          headers:{
+            'Content-Type':'application/json',
+            'X-Master-Key':KEY,
+            'X-Bin-Versioning':false,
+            'Cache-Control': 'no-cache'
+          },
+          body:JSON.stringify(dataToSave)
+        }); 
+        
+        if(!r.ok) throw r; 
+        
+        serverTimestamp = localTimestamp;
+        upd('synced'); 
+      } catch{ 
+        upd('error'); 
+      } 
+    }
+
+    function resolveConflict(choice) {
+      if(choice === 'server') {
+        prog = window.conflictData.server.data || {};
+        serverTimestamp = window.conflictData.serverTimestamp;
+        localTimestamp = Date.now();
+      } else {
+        // Keep local changes, will be saved next
+        serverTimestamp = window.conflictData.serverTimestamp;
+      }
+      
+      localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
+      document.getElementById('conflict-warning').style.display = 'none';
+      render();
+      
+      if(choice === 'local') {
+        saveToServer();
+      }
+    }
+
+    async function refreshFromServer() {
+      await loadFromServer(true);
+      render();
+    }
+
+    function render(){
+      openSections=[]; 
+      document.querySelectorAll('.collapsible').forEach((b,i)=>{ 
+        if(b.nextElementSibling && b.nextElementSibling.style.display==='block') openSections.push(i); 
+      });
+      
+      const c=document.getElementById('calendar-container'); 
+      c.innerHTML=''; 
+      let total=0, done=0;
+      
+      calendar.forEach(wk=>{
+        const btn=document.createElement('button'); 
+        btn.className='collapsible'; 
+        btn.textContent=`Week ${wk.week} - ${wk.range}`;
+        const sec=document.createElement('div'); 
+        sec.className='content week';
+        
+        wk.days.forEach(d=>{
+          let html=`<div class="day"><div class="day-header">${d.day} (${d.date})</div>`;
+          const groups={
+            "Heavy Lifting":d.ex.filter(e=>heavyLower.concat(heavyUpper).includes(e)),
+            "Micro-Workout":d.ex.filter(e=>micro.includes(e)),
+            "Skill Practice": d.ex.filter(e => skills.flat().includes(e)),
+            "Eccentric Program":d.ex.filter(e=>eccA.concat(eccB).includes(e))
+          };
+          
+          for(const [title, exs] of Object.entries(groups)){
+            if(exs.length){
+              html+=`<h3>${title}</h3><div class="tracking">`;
+              exs.forEach(ex=>{
+                // Fixed ID generation - now properly sanitizes all special characters
+                const id=`${d.date}-${sanitizeId(ex)}`;
+                
+                if(heavyLower.concat(heavyUpper).includes(ex)){
+                  total+=5; 
+                  ['done','weight','rep1','rep2','rep3','rpe'].forEach(f=>prog[id]?.[f] && done++);
+                  html+=`<div class="tracking-row">
+                    <input type="checkbox" onchange="set('${id}','done',this.checked)" ${prog[id]?.done?'checked':''}/>
+                    <label>${getExerciseLabel(ex)}</label>
+                    Wt:<input type="number" onchange="set('${id}','weight',this.value)" value="${prog[id]?.weight||''}"/>
+                    1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
+                    2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
+                    3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
+                    <label class="tooltip">
+                      RPE
+                      <span class="tooltip-image">
+                        <img src="https://blog.everfit.io/wp-content/uploads/2021/09/RPE-scale.png" alt="RPE Scale" style="width: 100%; border-radius: 6px;">
+                      </span>
+                    </label>:
+                    <input type="number" onchange="set('${id}','rpe',this.value)" value="${prog[id]?.rpe||''}"/>
+                    <input type="text" placeholder="Notes" onchange="set('${id}','note',this.value)" value="${prog[id]?.note||''}" style="margin-left:10px;width:120px;">
+                  </div>`;
+                } else {
+                  total+=4; 
+                  ['done','rep1','rep2','rep3'].forEach(f=>prog[id]?.[f] && done++);
+                  html+=`<div class="tracking-row">
+                    <input type="checkbox" onchange="set('${id}','done',this.checked)" ${prog[id]?.done?'checked':''}/>
+                    <label>${getExerciseLabel(ex)}</label>
+                    1:<input type="number" onchange="set('${id}','rep1',this.value)" value="${prog[id]?.rep1||''}"/>
+                    2:<input type="number" onchange="set('${id}','rep2',this.value)" value="${prog[id]?.rep2||''}"/>
+                    3:<input type="number" onchange="set('${id}','rep3',this.value)" value="${prog[id]?.rep3||''}"/>
+                    <input type="text" placeholder="Notes" onchange="set('${id}','note',this.value)" value="${prog[id]?.note||''}" style="margin-left:10px;width:120px;">
+                  </div>`;
+                }
+              });
+              html+='</div>';
+            }
+          }
+          html+='</div>'; 
+          sec.innerHTML+=html;
+        });
+        c.appendChild(btn); 
+        c.appendChild(sec);
+      });
+      
+      const pct=total?Math.round(done/total*100):0;
+      document.getElementById('progress-text').innerText=`${pct}%`;
+      document.getElementById('progress-fill').style.width=`${pct}%`;
+      
+      document.querySelectorAll('.collapsible').forEach((b,i)=>{ 
+        b.addEventListener('click',()=>{ 
+          const n=b.nextElementSibling; 
+          n.style.display=n.style.display==='block'?'none':'block'; 
+        }); 
+        if(openSections.includes(i)) b.nextElementSibling.style.display='block'; 
+      });
+    }
+
+    function set(id, field, val){
+      prog[id] = prog[id] || {};
+      if (field === 'done') {
+        prog[id][field] = val;
+      } else if (field === 'note') {
+        prog[id][field] = val; // Store the note as plain text
+      } else {
+        prog[id][field] = val === '' ? null : Number(val); // For numbers
+      }
+      render();
+      saveToServer();
+    }
+
+
+    function exportLog(){
+      let t='Training Log\\n\\n';
+      for(const k in prog) {
+        if(prog[k] && Object.keys(prog[k]).length > 0) {
+          t+=`${k}: ${JSON.stringify(prog[k])}\\n`;
+        }
+      }
+      const b=new Blob([t],{type:'text/plain'}), u=URL.createObjectURL(b), a=document.createElement('a');
+      a.href=u; a.download='training-log.txt'; a.click(); URL.revokeObjectURL(u);
+    }
+
+    // Periodic sync to detect external changes
+    function startPeriodicSync() {
+      if(syncInterval) clearInterval(syncInterval);
+      syncInterval = setInterval(async () => {
+        if(online) {
+          try {
+            const r = await fetch(`${API}${BIN}/latest`, {
+              headers: {
+                'X-Master-Key': KEY,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+              },
+              cache: 'no-store'
+            });
+
+            if(r.ok) {
+              const response = await r.json();
+              const remoteTimestamp = response.record?._timestamp || 0;
+              
+              if(remoteTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
+                // External changes detected
+                document.getElementById('conflict-warning').style.display = 'block';
+                window.conflictData = {server: response.record, local: prog, serverTimestamp: remoteTimestamp};
+              }
+            }
+          } catch(e) {
+            // Silent fail for background sync
+          }
+        }
+      }, 30000); // Check every 30 seconds
+    }
+
+    window.addEventListener('online',()=>{ 
+      online=true; 
+      saveToServer(); 
+      startPeriodicSync();
+    });
+    
+    window.addEventListener('offline',()=>{ 
+      online=false; 
+      upd('error'); 
+      if(syncInterval) clearInterval(syncInterval);
+    });
+    
+    window.addEventListener('beforeunload', () => {
+      if(syncInterval) clearInterval(syncInterval);
+    });
+    
+    document.addEventListener('DOMContentLoaded', async ()=>{ 
+      await loadFromServer(); 
+      render(); 
+      startPeriodicSync();
+    });
+  </script>
+</body>
+</html>
