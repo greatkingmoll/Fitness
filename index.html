@@ -332,39 +332,41 @@
       } 
     }
    
-    async function saveToServer(){ 
-      localTimestamp = Date.now();
-      const dataToSave = {
-        data: prog,
-        _timestamp: localTimestamp
-      };
-      
-      localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
-      
-      if(!online){ 
-        upd('error');
-        return;
-      } 
-      
-      try{ 
-        const r = await fetch(API, {
-          method:'PUT',
-          headers:{
-            'Content-Type':'application/json',
-            'Cache-Control': 'no-cache'
-          },
-          body:JSON.stringify(dataToSave)
-        }); 
-        
-        if(!r.ok) throw new Error(`HTTP ${r.status}`); 
-        
-        serverTimestamp = localTimestamp;
-        upd('synced'); 
-      } catch(e){ 
-        console.warn('Save failed:', e);
-        upd('error'); 
-      } 
-    }
+async function saveToServer(){ 
+  localTimestamp = Date.now();
+  const dataToSave = {
+    data: prog,
+    _timestamp: localTimestamp
+  };
+  
+  // Always update local backup
+  localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
+  
+  if(!online){ 
+    upd('error');
+    return;
+  } 
+  
+  try{ 
+    const r = await fetch(API, {
+      // IMPORTANT: Pantry expects POST for create/replace basket
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      body:JSON.stringify(dataToSave)
+    }); 
+    
+    if(!r.ok) throw new Error(`HTTP ${r.status}`); 
+    
+    serverTimestamp = localTimestamp;
+    upd('synced'); 
+  } catch(e){ 
+    console.warn('Save failed:', e);
+    upd('error'); 
+  } 
+}
 
     function resolveConflict(choice) {
       if(choice === 'server') {
