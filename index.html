@@ -343,27 +343,27 @@ async function saveToServer(){
     data: prog,
     _timestamp: localTimestamp
   };
-  
+
   // Always update local backup
-  localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
+  localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
   
-  if(!online){ 
+  if (!online) { 
     upd('error');
     return;
   } 
   
-  try{ 
-    const r = await fetch(API, {
+  try { 
+    const r = await fetch(pantryUrl(), {   // ← use pantryUrl() here
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToSave)
     });
     
-    if(!r.ok) throw new Error(`HTTP ${r.status}`); 
+    if (!r.ok) throw new Error(`HTTP ${r.status}`); 
     
     serverTimestamp = localTimestamp;
     upd('synced'); 
-  } catch(e){ 
+  } catch (e) { 
     console.warn('Save failed:', e);
     upd('error'); 
   } 
