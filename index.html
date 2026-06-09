@@ -291,43 +291,51 @@
       e.style.color={synced:'#27ae60',pending:'#f39c12',error:'#e74c3c'}[s]; 
     }
     
-    async function loadFromServer(skipConflictCheck = false){ 
-      upd('pending'); 
-      
-      try{ 
-        const r = await fetch(pantryUrl(), { method: 'GET', cache: 'no-store' });
-        
-        let serverData = {};
-        if (r.ok) {
-          serverData = await r.json();
-        }
+async function loadFromServer(skipConflictCheck = false){ 
+  upd('pending'); 
+  
+  try { 
+    const r = await fetch(pantryUrl(), { method: 'GET', cache: 'no-store' });
 
-        const newServerTimestamp = serverData._timestamp || Date.now();
-        
-        if(!skipConflictCheck && localTimestamp > 0 && serverTimestamp > 0 && newServerTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
-          document.getElementById('conflict-warning').style.display = 'block';
-          window.conflictData = {server: serverData, local: prog, serverTimestamp: newServerTimestamp};
-          return;
-        }
-        
-        prog = serverData.data || {};
-        serverTimestamp = newServerTimestamp;
-        localTimestamp = Date.now();
-        
-        localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
-        upd('synced'); 
-        
-      } catch(error){ 
-        console.warn('Server fetch failed, using backup:', error);
-        const stored = localStorage.getItem("prog_backup");
-        if(stored) {
-          const backup = JSON.parse(stored);
-          prog = backup.data || {};
-          localTimestamp = backup.timestamp || 0;
-        }
-        upd('error'); 
-      } 
+    if (r.status === 404) {
+      prog = {};
+      serverTimestamp = 0;
+      localTimestamp = Date.now();
+      localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
+      upd('synced');
+      return;
     }
+
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+    const serverData = await r.json();
+    const newServerTimestamp = serverData._timestamp || 0;
+
+    if (!skipConflictCheck && localTimestamp > 0 && serverTimestamp > 0 &&
+        newServerTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
+      document.getElementById('conflict-warning').style.display = 'block';
+      window.conflictData = { server: serverData, local: prog, serverTimestamp: newServerTimestamp };
+      return;
+    }
+
+    prog = serverData.data || {};
+    serverTimestamp = newServerTimestamp;
+    localTimestamp = Date.now();
+
+    localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
+    upd('synced');
+
+  } catch (error) { 
+    console.warn('Server fetch failed, using backup:', error);
+    const stored = localStorage.getItem("prog_backup");
+    if (stored) {
+      const backup = JSON.parse(stored);
+      prog = backup.data || {};
+      localTimestamp = backup.timestamp || 0;
+    }
+    upd('error');
+  } 
+}
    
 async function saveToServer(){ 
   localTimestamp = Date.now();
