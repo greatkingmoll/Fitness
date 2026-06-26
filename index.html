@@ -392,12 +392,20 @@ async function loadFromServer(skipConflictCheck = false) {
     upd('error');
   }
 }
-   
+
+let pendingSaveTimeout = null;
+    
 async function saveToServer() {
   // Update local timestamp and backup first
   localTimestamp = Date.now();
   saveBackup();
-
+  
+  // Clear any older scheduled retry — this call supersedes it
+  if (pendingSaveTimeout) {
+    clearTimeout(pendingSaveTimeout);
+    pendingSaveTimeout = null;
+  }
+  
   try {
     const r = await fetch(pantryUrl(), {
       method: 'POST',
@@ -413,9 +421,18 @@ async function saveToServer() {
     upd('synced');
   } catch (e) {
     console.warn("Save to server failed", e);
-    // Local backup already updated; just mark as offline/error
-    upd('error');
-  }
+    const maxRetries = 5;
+    if (retryCount < maxRetries) {
+      const delayMs = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
+      upd('pending'); // e.g., show "Syncing (retry in a moment)..."
+      pendingSaveTimeout = setTimeout(() => {
+        saveToServer(retryCount + 1);
+      }, delayMs);
+    } else {
+      // Give up for now; user can keep working locally
+      upd('error'); // e.g., "Cloud sync failed · local changes saved"
+    }
+  }  
 }
 
 function resolveConflict(choice) {
