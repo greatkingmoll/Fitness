@@ -637,15 +637,13 @@ function startPeriodicSync() {
       const remoteData = remote.data || {};
 
       // If server is ahead of local, surface a conflict
-      if (remoteTimestamp > backup.timestamp && Object.keys(backup.data).length > 0) {
-        window.conflictData = {
-          server: remoteData,
-          serverTimestamp: remoteTimestamp,
-          local: backup.data,
-          localTimestamp: backup.timestamp
-        };
-        document.getElementById('conflict-warning').style.display = 'block';
-        upd('pending');
+      if (remoteTimestamp > backup.timestamp) {
+        prog = remoteData;
+        serverTimestamp = remoteTimestamp;
+        localTimestamp = Date.now();
+        saveBackup();
+        render();
+        upd('synced');
       }
     } catch (e) {
       // Silent failure – we stay in offline mode until a save/load succeeds
