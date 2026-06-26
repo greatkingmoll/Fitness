@@ -394,6 +394,19 @@ async function loadFromServer(skipConflictCheck = false) {
 }
 
 let pendingSaveTimeout = null;
+
+// Debounced save scheduler
+function scheduleSave() {
+  // Cancel any previously scheduled save
+  if (pendingSaveTimeout) {
+    clearTimeout(pendingSaveTimeout);
+  }
+  // Schedule a save after 1s of inactivity
+  pendingSaveTimeout = setTimeout(() => {
+    pendingSaveTimeout = null;
+    saveToServer(); // backoff-enabled version below
+  }, 1000); // 1000 ms = 1 second
+}
     
 async function saveToServer() {
   // Update local timestamp and backup first
@@ -426,6 +439,7 @@ async function saveToServer() {
       const delayMs = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
       upd('pending'); // e.g., show "Syncing (retry in a moment)..."
       pendingSaveTimeout = setTimeout(() => {
+        pendingSaveTimeout = null;
         saveToServer(retryCount + 1);
       }, delayMs);
     } else {
@@ -560,18 +574,26 @@ async function refreshFromServer() {
       });
     }
 
-    function set(id, field, val){
-      prog[id] = prog[id] || {};
-      if (field === 'done') {
-        prog[id][field] = val;
-      } else if (field === 'note') {
-        prog[id][field] = val;
-      } else {
-        prog[id][field] = val === '' ? null : Number(val);
-      }
-      render();
-      saveToServer();
-    }
+function set(id, field, val) {
+  if (!prog[id]) {
+    prog[id] = {};
+  }
+
+  if (field === 'done') {
+    prog[id][field] = val;
+  } else if (field === 'note') {
+    prog[id][field] = val;
+  } else {
+    prog[id][field] = val ? Number(val) : null;
+  }
+
+  // Update UI immediately
+  render();
+
+  // Do NOT call saveToServer() directly here.
+  // Debounce the save so multiple rapid edits become one POST.
+  scheduleSave();
+}
 
     function exportLog(){
       let t='Training Log\n\n';
