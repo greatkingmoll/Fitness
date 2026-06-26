@@ -417,7 +417,7 @@ function scheduleSave() {
   }, 1000); // 1000 ms = 1 second
 }
     
-async function saveToServer() {
+async function saveToServer(retryCount = 0) {
   // Update local timestamp and backup first
   localTimestamp = Date.now();
   saveBackup();
