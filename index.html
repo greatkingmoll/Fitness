@@ -349,24 +349,33 @@ async function loadFromServer(skipConflictCheck = false) {
     // If caller explicitly wants "just pick the newest", do that here.
     if (skipConflictCheck) {
       if (remoteTimestamp > backup.timestamp) {
-        // Server is newer – take it
+        // Server is newer – always take it
         prog = remoteData;
         serverTimestamp = remoteTimestamp;
         localTimestamp = Date.now();
-        saveBackup();
       } else {
         // Local is newer or equal – keep local
         prog = backup.data;
         localTimestamp = backup.timestamp;
         serverTimestamp = remoteTimestamp;
       }
+      saveBackup();
       upd('synced');
       return;
     }
 
-    // Normal path: conflict if server has newer data than local
-    if (remoteTimestamp > backup.timestamp && Object.keys(backup.data).length > 0) {
-      // Show conflict UI – user chooses Server vs Local
+    // Normal path: if server is newer than local backup, always use server data
+    if (remoteTimestamp > backup.timestamp) {
+      prog = remoteData;
+      serverTimestamp = remoteTimestamp;
+      localTimestamp = Date.now();
+      saveBackup();
+      upd('synced');
+      return;
+    }
+
+    // Only show conflict if LOCAL backup is ahead of SERVER
+    if (backup.timestamp > remoteTimestamp && Object.keys(backup.data).length > 0) {
       window.conflictData = {
         server: remoteData,
         serverTimestamp: remoteTimestamp,
@@ -378,7 +387,7 @@ async function loadFromServer(skipConflictCheck = false) {
       return;
     }
 
-    // No conflict: keep local (offline-first), but update serverTimestamp
+    // No difference in timestamps: keep local
     prog = backup.data;
     localTimestamp = backup.timestamp;
     serverTimestamp = remoteTimestamp;
