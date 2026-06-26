@@ -449,7 +449,7 @@ function resolveConflict(choice) {
     // Unknown choice – just hide
     warning.style.display = 'none';
   }
-
+}
 async function refreshFromServer() {
   // Keep conflict detection on refresh so newer remote data doesn't silently overwrite local
   await loadFromServer(false);
