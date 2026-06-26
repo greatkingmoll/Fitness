@@ -291,106 +291,170 @@
       e.style.color={synced:'#27ae60',pending:'#f39c12',error:'#e74c3c'}[s]; 
     }
     
-async function loadFromServer(skipConflictCheck = false){ 
-  upd('pending'); 
-  
-  try { 
-    const r = await fetch(pantryUrl(), { method: 'GET', cache: 'no-store' });
+function loadBackup() {
+  const stored = localStorage.getItem("prog_backup");
+  if (!stored) {
+    return { data: {}, timestamp: 0 };
+  }
+  try {
+    const backup = JSON.parse(stored);
+    return {
+      data: backup.data || {},
+      timestamp: backup.timestamp || 0
+    };
+  } catch (e) {
+    console.error("Failed to parse prog_backup", e);
+    return { data: {}, timestamp: 0 };
+  }
+}
 
+function saveBackup() {
+  localStorage.setItem(
+    "prog_backup",
+    JSON.stringify({ data: prog, timestamp: localTimestamp })
+  );
+}
+
+async function loadFromServer(skipConflictCheck = false) {
+  upd('pending');
+
+  // Always know current local backup
+  const backup = loadBackup();
+
+  try {
+    const r = await fetch(pantryUrl(), {
+      method: 'GET',
+      cache: 'no-store'
+    });
+
+    // Basket missing on server → keep local, do NOT wipe
     if (r.status === 404) {
-      prog = {};
+      console.warn("Pantry basket not found (404). Keeping local backup.");
       serverTimestamp = 0;
-      localTimestamp = Date.now();
-      localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
+      prog = backup.data;
+      localTimestamp = backup.timestamp;
+      saveBackup();
+      upd('error'); // server empty, but local data is ok
+      return;
+    }
+
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
+    }
+
+    const serverData = await r.json();
+    const remoteData = serverData.data || {};
+    const remoteTimestamp = serverData.timestamp || serverData._timestamp || 0;
+
+    // If caller explicitly wants "just pick the newest", do that here.
+    if (skipConflictCheck) {
+      if (remoteTimestamp > backup.timestamp) {
+        // Server is newer – take it
+        prog = remoteData;
+        serverTimestamp = remoteTimestamp;
+        localTimestamp = Date.now();
+        saveBackup();
+      } else {
+        // Local is newer or equal – keep local
+        prog = backup.data;
+        localTimestamp = backup.timestamp;
+        serverTimestamp = remoteTimestamp;
+      }
       upd('synced');
       return;
     }
 
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-
-    const serverData = await r.json();
-    const newServerTimestamp = serverData._timestamp || 0;
-
-    if (!skipConflictCheck && localTimestamp > 0 && serverTimestamp > 0 &&
-        newServerTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
+    // Normal path: conflict if server has newer data than local
+    if (remoteTimestamp > backup.timestamp && Object.keys(backup.data).length > 0) {
+      // Show conflict UI – user chooses Server vs Local
+      window.conflictData = {
+        server: remoteData,
+        serverTimestamp: remoteTimestamp,
+        local: backup.data,
+        localTimestamp: backup.timestamp
+      };
       document.getElementById('conflict-warning').style.display = 'block';
-      window.conflictData = { server: serverData, local: prog, serverTimestamp: newServerTimestamp };
+      upd('pending');
       return;
     }
 
-    prog = serverData.data || {};
-    serverTimestamp = newServerTimestamp;
-    localTimestamp = Date.now();
-
-    localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
+    // No conflict: keep local (offline-first), but update serverTimestamp
+    prog = backup.data;
+    localTimestamp = backup.timestamp;
+    serverTimestamp = remoteTimestamp;
+    saveBackup();
     upd('synced');
-
-  } catch (error) { 
-    console.warn('Server fetch failed, using backup:', error);
-    const stored = localStorage.getItem("prog_backup");
-    if (stored) {
-      const backup = JSON.parse(stored);
-      prog = backup.data || {};
-      localTimestamp = backup.timestamp || 0;
-    }
+  } catch (error) {
+    console.warn("Server fetch failed, using backup", error);
+    // Fall back to backup regardless of error type
+    prog = backup.data;
+    localTimestamp = backup.timestamp;
     upd('error');
-  } 
+  }
 }
    
-async function saveToServer(){ 
+async function saveToServer() {
+  // Update local timestamp and backup first
   localTimestamp = Date.now();
-  const dataToSave = {
-    data: prog,
-    _timestamp: localTimestamp
-  };
+  saveBackup();
 
-  // Always update local backup
-  localStorage.setItem("prog_backup", JSON.stringify({ data: prog, timestamp: localTimestamp }));
-  
-  if (!online) { 
-    upd('error');
-    return;
-  } 
-  
-  try { 
-    const r = await fetch(pantryUrl(), {   // ← use pantryUrl() here
+  try {
+    const r = await fetch(pantryUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dataToSave)
+      body: JSON.stringify({ data: prog, timestamp: localTimestamp })
     });
-    
-    if (!r.ok) throw new Error(`HTTP ${r.status}`); 
-    
+
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
+    }
+
     serverTimestamp = localTimestamp;
-    upd('synced'); 
-  } catch (e) { 
-    console.warn('Save failed:', e);
-    upd('error'); 
-  } 
+    upd('synced');
+  } catch (e) {
+    console.warn("Save to server failed", e);
+    // Local backup already updated; just mark as offline/error
+    upd('error');
+  }
 }
 
-    function resolveConflict(choice) {
-      if(choice === 'server') {
-        prog = window.conflictData.server.data || {};
-        serverTimestamp = window.conflictData.serverTimestamp;
-        localTimestamp = Date.now();
-      } else {
-        serverTimestamp = window.conflictData.serverTimestamp;
-      }
-      
-      localStorage.setItem("prog_backup", JSON.stringify({data: prog, timestamp: localTimestamp}));
-      document.getElementById('conflict-warning').style.display = 'none';
-      render();
-      
-      if(choice === 'local') {
-        saveToServer();
-      }
-    }
+function resolveConflict(choice) {
+  const warning = document.getElementById('conflict-warning');
 
-    async function refreshFromServer() {
-      await loadFromServer(true);
-      render();
-    }
+  if (!window.conflictData) {
+    warning.style.display = 'none';
+    return;
+  }
+
+  if (choice === 'server') {
+    // Use server version
+    prog = window.conflictData.server || {};
+    serverTimestamp = window.conflictData.serverTimestamp || 0;
+    localTimestamp = Date.now();
+    saveBackup();
+    warning.style.display = 'none';
+    render();
+    upd('synced');
+  } else if (choice === 'local') {
+    // Keep local changes and push them to server
+    prog = window.conflictData.local || {};
+    serverTimestamp = window.conflictData.serverTimestamp || 0;
+    localTimestamp = window.conflictData.localTimestamp || Date.now();
+    saveBackup();
+    warning.style.display = 'none';
+    render();
+    // Try to overwrite remote with our local copy
+    saveToServer();
+  } else {
+    // Unknown choice – just hide
+    warning.style.display = 'none';
+  }
+
+async function refreshFromServer() {
+  // Keep conflict detection on refresh so newer remote data doesn't silently overwrite local
+  await loadFromServer(false);
+  render();
+}
 
     function render(){
       openSections=[]; 
@@ -503,50 +567,80 @@ async function saveToServer(){
       a.href=u; a.download='training-log.txt'; a.click(); URL.revokeObjectURL(u);
     }
 
-    function startPeriodicSync() {
-      if(syncInterval) clearInterval(syncInterval);
-      syncInterval = setInterval(async () => {
-        if(online) {
-          try {
-            const r = await fetch(pantryUrl(), { method: 'GET', cache: 'no-store' });
-            
-            if(r.ok) {
-              const remote = await r.json();
-              const remoteTimestamp = remote._timestamp || 0;
-              
-              if(remoteTimestamp > serverTimestamp && Object.keys(prog).length > 0) {
-                document.getElementById('conflict-warning').style.display = 'block';
-                window.conflictData = {server: remote, local: prog, serverTimestamp: remoteTimestamp};
-              }
-            }
-          } catch(e) {
-            // silent
-          }
-        }
-      }, 30000);
-    }
+function startPeriodicSync() {
+  if (syncInterval) {
+    clearInterval(syncInterval);
+  }
 
-    window.addEventListener('online',()=>{ 
-      online=true; 
-      saveToServer(); 
-      startPeriodicSync();
-    });
+  syncInterval = setInterval(async () => {
+    if (!online) return;
+
+    const backup = loadBackup();
+
+    try {
+      const r = await fetch(pantryUrl(), {
+        method: 'GET',
+        cache: 'no-store'
+      });
+      if (!r.ok) return;
+
+      const remote = await r.json();
+      const remoteTimestamp = remote.timestamp || remote._timestamp || 0;
+      const remoteData = remote.data || {};
+
+      // If server is ahead of local, surface a conflict
+      if (remoteTimestamp > backup.timestamp && Object.keys(backup.data).length > 0) {
+        window.conflictData = {
+          server: remoteData,
+          serverTimestamp: remoteTimestamp,
+          local: backup.data,
+          localTimestamp: backup.timestamp
+        };
+        document.getElementById('conflict-warning').style.display = 'block';
+        upd('pending');
+      }
+    } catch (e) {
+      // Silent failure – we stay in offline mode until a save/load succeeds
+      console.debug("Periodic sync check failed", e);
+    }
+  }, 30000); // 30 seconds
+}
+
+window.addEventListener('online', () => {
+  online = true;
+  // Attempt to push latest local state to server when we come back online
+  saveToServer();
+  startPeriodicSync();
+});
+
+window.addEventListener('offline', () => {
+  online = false;
+  upd('error');
+  if (syncInterval) {
+    clearInterval(syncInterval);
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  if (syncInterval) {
+    clearInterval(syncInterval);
+  }
+});
     
-    window.addEventListener('offline',()=>{ 
-      online=false; 
-      upd('error'); 
-      if(syncInterval) clearInterval(syncInterval);
-    });
-    
-    window.addEventListener('beforeunload', () => {
-      if(syncInterval) clearInterval(syncInterval);
-    });
-    
-    document.addEventListener('DOMContentLoaded', async ()=>{ 
-      await loadFromServer(); 
-      render(); 
-      startPeriodicSync();
-    });
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Load local backup immediately so UI shows something even if server is down.
+  const backup = loadBackup();
+  prog = backup.data;
+  localTimestamp = backup.timestamp;
+  render();
+
+  // 2. Try to reconcile with server (offline-first logic).
+  await loadFromServer(false);
+  render();
+
+  // 3. Start periodic sync checks.
+  startPeriodicSync();
+});
   </script>
 </body>
 </html>
