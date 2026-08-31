@@ -692,14 +692,20 @@ async function refreshFromServer() {
       document.getElementById('progress-text').innerText=`${pct}%`;
       document.getElementById('progress-fill').style.width=`${pct}%`;
       
-      document.querySelectorAll('.collapsible').forEach((b,i)=>{ 
-        b.addEventListener('click',()=>{ 
-          const n=b.nextElementSibling; 
-          n.style.display=n.style.display==='block'?'none':'block'; 
-        }); 
-        if(openSections.includes(i)) b.nextElementSibling.style.display='block'; 
+      document.querySelectorAll('.collapsible').forEach((b, i) => {
+        if (!b.dataset.collapseListenerAttached) {
+          b.addEventListener('click', () => {
+            const n = b.nextElementSibling;
+            n.style.display = n.style.display === 'block' ? 'none' : 'block';
+          });
+      
+          b.dataset.collapseListenerAttached = 'true';
+        }
+      
+        if (openSections.includes(i)) {
+          b.nextElementSibling.style.display = 'block';
+        }
       });
-    }
 
 function set(id, field, val) {
   if (!prog[id]) {
