@@ -369,7 +369,6 @@
         const date=`${dd}-${mon}`, idx=dt.getDay(), names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
         let ex=[];
         
-        if(idx===1){ ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]); }
         if(idx===1){ 
           ex=[...heavyLower]; for(let i=0;i<3;i++) ex.push(micro[(w*3+i)%15]);
           ex.push(...(w%2?powerBlockB:powerBlockA));
